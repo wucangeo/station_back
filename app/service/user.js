@@ -16,6 +16,16 @@ let attrs = [
   "created_at"
 ];
 class User extends Service {
+  async login(username, password) {
+    var query = {
+      where: {
+        username: username,
+        password: password
+      }
+    };
+    var user = this.ctx.model.User.findOne(query);
+    return user;
+  }
   async list({
     offset = 0,
     limit = 10,
@@ -28,11 +38,11 @@ class User extends Service {
       order: [[order_by, order.toUpperCase()]]
     });
   }
-  async get(user_id) {
+  async get(id) {
     var query = {
       attributes: attrs,
       where: {
-        id: user_id
+        id: id
       }
     };
     var user = this.ctx.model.User.findOne(query);
@@ -53,8 +63,8 @@ class User extends Service {
     }
     return result;
   }
-  async update({ user_id, updates }) {
-    const user = await this.ctx.model.User.findById(user_id);
+  async update({ id, updates }) {
+    const user = await this.ctx.model.User.findById(id);
     if (!user) {
       return false;
     }
@@ -70,15 +80,14 @@ class User extends Service {
     delete result.password;
     return result;
   }
-  async login(username, password) {
-    var query = {
-      where: {
-        username: username,
-        password: password
-      }
-    };
-    var user = this.ctx.model.User.findOne(query);
-    return user;
+  async delete(id) {
+    const users = await this.ctx.model.User.destroy({
+      where: { id: { $in: ids } }
+    });
+    if (!users) {
+      return false;
+    }
+    return users;
   }
 }
 module.exports = User;
