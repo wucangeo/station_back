@@ -3,10 +3,11 @@ module.exports = app => {
   const Token = app.model.define(
     "token",
     {
-      token: {
-        type: STRING(50),
+      id: {
+        type: INTEGER,
         primaryKey: true
       },
+      token: STRING(50),
       last_access: DATE,
       user_id: INTEGER
     },

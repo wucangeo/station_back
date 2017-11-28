@@ -88,7 +88,7 @@ class User extends Service {
     delete result.password;
     return result;
   }
-  async delete(id) {
+  async delete(ids) {
     const users = await this.ctx.model.User.destroy({
       where: { id: { $in: ids } }
     });
