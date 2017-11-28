@@ -27,16 +27,24 @@ class User extends Service {
     return user;
   }
   async list({
+    key = null,
     offset = 0,
     limit = 10,
     order_by = "created_at",
     order = "ASC"
   }) {
-    return this.ctx.model.User.findAndCountAll({
-      offset,
-      limit,
-      order: [[order_by, order.toUpperCase()]]
-    });
+    var query = {};
+    if (key) {
+      query.where = { name: { $like: "%" + key + "%" } };
+    }
+    if (parseInt(offset) != null && parseInt(limit) != null) {
+      query.offset = parseInt(offset);
+      query.limit = parseInt(limit);
+    }
+    if (order_by && order) {
+      query.order = [[order_by, order.toUpperCase()]];
+    }
+    return this.ctx.model.User.findAndCountAll(query);
   }
   async get(id) {
     var query = {
