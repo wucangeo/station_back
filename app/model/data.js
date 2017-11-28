@@ -22,9 +22,9 @@ module.exports = app => {
       contact: STRING(255),
       enable: INTEGER,
       created_user: INTEGER,
-      created_time: DATE,
+      created_at: DATE,
       updated_user: INTEGER,
-      updated_time: DATE
+      updated_at: DATE
     },
     {
       underscored: true,

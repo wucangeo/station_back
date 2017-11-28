@@ -31,10 +31,6 @@ class Data extends Service {
   }
   async create(item) {
     let result = await this.ctx.model.Data.create(item);
-    if (result) {
-      result = JSON.parse(JSON.stringify(result));
-      delete result.password;
-    }
     return result;
   }
   async update({ id, updates }) {
@@ -47,7 +43,7 @@ class Data extends Service {
     delete result.password;
     return result;
   }
-  async delete(id) {
+  async delete(ids) {
     const datas = await this.ctx.model.Data.destroy({
       where: { id: { $in: ids } }
     });
