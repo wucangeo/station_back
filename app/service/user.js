@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const Service = require("egg").Service;
 let attrs = [
   "id",
@@ -38,8 +39,16 @@ class User extends Service {
     return user;
   }
   async create(item) {
+    if (item.password) {
+      const hash = crypto
+        .createHmac("sha256", item.password)
+        .update("stations")
+        .digest("hex");
+      item.password = hash;
+    }
     let result = await this.ctx.model.User.create(item);
     if (result) {
+      result = JSON.parse(JSON.stringify(result));
       delete result.password;
     }
     return result;
@@ -49,7 +58,17 @@ class User extends Service {
     if (!user) {
       return false;
     }
-    return user.update(updates);
+    if (updates.password) {
+      const hash = crypto
+        .createHmac("sha256", updates.password)
+        .update("stations")
+        .digest("hex");
+      updates.password = hash;
+    }
+    let result = await user.update(updates);
+    result.password = null;
+    delete result.password;
+    return result;
   }
   async login(username, password) {
     var query = {

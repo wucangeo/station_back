@@ -34,6 +34,20 @@ class UserController extends Controller {
   async create() {
     const { ctx, service } = this;
     var item = ctx.request.body;
+    if (!item.username || item.username.trim() == "") {
+      this.ctx.body = {
+        status: 400,
+        msg: "缺少用户名。"
+      };
+      return;
+    }
+    if (!item.password) {
+      this.ctx.body = {
+        status: 400,
+        msg: "缺少用户名。"
+      };
+      return;
+    }
     let result = await ctx.service.user.create(item);
     if (result) {
       this.ctx.body = {
