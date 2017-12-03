@@ -64,6 +64,10 @@ class User extends Service {
         .digest("hex");
       item.password = hash;
     }
+    item.is_admin = item.is_admin ? item.is_admin : 0;
+    item.enable = item.enable ? item.enable : 0;
+    item.created_user = item.created_user ? item.created_user : 0;
+    item.updated_user = item.updated_user ? item.updated_user : 0;
     let result = await this.ctx.model.User.create(item);
     if (result) {
       result = JSON.parse(JSON.stringify(result));
@@ -83,6 +87,11 @@ class User extends Service {
         .digest("hex");
       updates.password = hash;
     }
+    updates.is_admin = updates.is_admin ? updates.is_admin : 0;
+    updates.enable = updates.enable ? updates.enable : 0;
+    updates.created_user = updates.created_user ? updates.created_user : 0;
+    updates.updated_user = updates.updated_user ? updates.updated_user : 0;
+
     let result = await user.update(updates);
     result.password = null;
     delete result.password;

@@ -11,7 +11,7 @@ module.exports = app => {
       username: STRING(50),
       password: STRING(50),
       name: STRING(255),
-      school: STRING(255),
+      department: STRING(255),
       phone: STRING(255),
       email: STRING(255),
       avatar: STRING(255),
