@@ -9,6 +9,10 @@ module.exports = appInfo => {
   // add your config here
   config.middleware = [];
 
+  config.security = {
+    domainWhiteList: ["http://localhost:8080"]
+  };
+
   //database
   config.sequelize = {
     dialect: "mysql", // support: mysql, mariadb, postgres, mssql

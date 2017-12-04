@@ -9,6 +9,14 @@ exports.sequelize = {
   password: "noroot"
 };
 
+exports.cors = {
+  origin: "*",
+  allowMethods: "GET,HEAD,PUT,POST,DELETE,PATCH"
+};
+
 exports.security = {
-  // domainWhiteList: ["http://139.196.125.45"]
+  domainWhiteList: ["http://localhost:8080"],
+  csrf: {
+    enable: false
+  }
 };
