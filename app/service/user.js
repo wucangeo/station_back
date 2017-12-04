@@ -1,10 +1,9 @@
-const crypto = require("crypto");
 const Service = require("egg").Service;
 let attrs = [
-  "id",
+  "data_id",
   "username",
   "name",
-  "school",
+  "department",
   "phone",
   "email",
   "avatar",
@@ -15,17 +14,8 @@ let attrs = [
   "updated_user",
   "created_at"
 ];
+
 class User extends Service {
-  async login(username, password) {
-    var query = {
-      where: {
-        username: username,
-        password: password
-      }
-    };
-    var user = this.ctx.model.User.findOne(query);
-    return user;
-  }
   async list({
     key = null,
     offset = 0,
@@ -33,7 +23,15 @@ class User extends Service {
     order_by = "created_at",
     order = "ASC"
   }) {
-    var query = {};
+    let result = {
+      code: 1,
+      data: null,
+      msg: "查询成功。"
+    };
+    var query = {
+      attributes: attrs,
+      virtual: false
+    };
     if (key) {
       query.where = { name: { $like: "%" + key + "%" } };
     }
@@ -42,69 +40,135 @@ class User extends Service {
       query.limit = parseInt(limit);
     }
     if (order_by && order) {
+      order = parseInt(order) === 1 ? "DESC" : "ASC";
       query.order = [[order_by, order.toUpperCase()]];
     }
-    return this.ctx.model.User.findAndCountAll(query);
+    let users = await this.ctx.model.User.findAndCountAll(query);
+
+    result.data = users ? users : [];
+    return result;
   }
-  async get(id) {
+  async get(user_id) {
+    let result = {
+      code: 1,
+      data: null,
+      msg: "查询成功。"
+    };
+    if (!user_id) {
+      result.code = 0;
+      result.msg = "缺少参数。";
+      return result;
+    }
     var query = {
       attributes: attrs,
       where: {
-        id: id
+        data_id: user_id
       }
     };
-    var user = this.ctx.model.User.findOne(query);
-    return user;
+    var user = await this.ctx.model.User.findOne(query);
+
+    result.data = user;
+    return result;
   }
   async create(item) {
-    if (item.password) {
-      const hash = crypto
-        .createHmac("sha256", item.password)
-        .update("stations")
-        .digest("hex");
-      item.password = hash;
+    let result = {
+      code: 1,
+      data: null,
+      msg: "创建成功。"
+    };
+    if (!item.username) {
+      result.code = 0;
+      result.msg = "缺少用户名。";
+      return result;
+    }
+    if (!item.password) {
+      result.code = 0;
+      result.msg = "缺少密码。";
+      return result;
     }
     item.is_admin = item.is_admin ? item.is_admin : 0;
     item.enable = item.enable ? item.enable : 0;
     item.created_user = item.created_user ? item.created_user : 0;
     item.updated_user = item.updated_user ? item.updated_user : 0;
-    let result = await this.ctx.model.User.create(item);
-    if (result) {
-      result = JSON.parse(JSON.stringify(result));
-      delete result.password;
+    let user_created = await this.ctx.model.User.create(item);
+    if (!user_created) {
+      result.code = 0;
+      result.msg = "创建失败！";
+      return result;
     }
+    result.data = user_created.toJson();
     return result;
   }
-  async update({ id, updates }) {
-    const user = await this.ctx.model.User.findById(id);
+  async update({ data_id, updates }) {
+    let result = {
+      code: 1,
+      data: null,
+      msg: "更新成功。"
+    };
+    const user = await this.ctx.model.User.findById(data_id);
     if (!user) {
-      return false;
+      result.code = 0;
+      result.msg = "未找到用户。";
+      return result;
     }
-    if (updates.password) {
-      const hash = crypto
-        .createHmac("sha256", updates.password)
-        .update("stations")
-        .digest("hex");
-      updates.password = hash;
-    }
+
     updates.is_admin = updates.is_admin ? updates.is_admin : 0;
     updates.enable = updates.enable ? updates.enable : 0;
     updates.created_user = updates.created_user ? updates.created_user : 0;
     updates.updated_user = updates.updated_user ? updates.updated_user : 0;
 
-    let result = await user.update(updates);
-    result.password = null;
-    delete result.password;
+    let user_updated = await user.update(updates);
+    result.data = user_updated.toJson();
     return result;
   }
   async delete(ids) {
+    let result = {
+      code: 1,
+      data: null,
+      msg: "删除成功。"
+    };
+    if (!ids) {
+      result.code = 0;
+      result.msg = "参数错误。";
+      return result;
+    }
+    ids = JSON.parse(ids);
     const users = await this.ctx.model.User.destroy({
-      where: { id: { $in: ids } }
+      where: { data_id: { $in: ids } }
     });
     if (!users) {
-      return false;
+      result.code = 0;
+      result.msg = "删除失败";
+      return result;
     }
-    return users;
+    result.data = users;
+    return result;
+  }
+  async login(username, password) {
+    let result = {
+      code: 1,
+      data: null,
+      msg: "登录成功。"
+    };
+    var query = {
+      where: {
+        username: username
+      }
+    };
+    var user = await this.ctx.model.User.findOne(query);
+    if (!user) {
+      result.code = 0;
+      result.msg = "未找到该用户。";
+      return result;
+    }
+    let verify = await user.validPassword(password);
+    if (!verify) {
+      result.code = 0;
+      result.msg = "密码错误。";
+      return result;
+    }
+    result.data = await user.toJson();
+    return result;
   }
 }
 module.exports = User;
