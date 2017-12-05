@@ -151,6 +151,11 @@ class User extends Service {
     updates.updated_user = user_id;
 
     let user_updated = await user.update(updates);
+    if (!user_updated) {
+      result.code = 0;
+      result.msg = "更新失败。";
+      return result;
+    }
     result.data = user_updated.toJson();
     return result;
   }
