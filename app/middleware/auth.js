@@ -19,15 +19,17 @@ module.exports = options => {
         data: null,
         msg: "access_token缺失"
       };
+      return;
     }
     var decoded = jwt.decode(access_token, { json: true });
-    if (!decoded.user_id) {
+    if (!decoded || !decoded.user_id) {
       ctx.status = 401;
       ctx.body = {
         code: 0,
         data: null,
         msg: "access_token不符合标准。"
       };
+      return;
     }
     let res_user = await ctx.service.user.get(decoded.user_id, true);
     let user = res_user.data;
@@ -46,6 +48,7 @@ module.exports = options => {
         data: null,
         msg: "用户未认证"
       };
+      return;
     }
     let res_verify = jwt.verify(access_token, user.salt);
     if (!res_verify) {
@@ -55,6 +58,7 @@ module.exports = options => {
         data: null,
         msg: "access_token无效。"
       };
+      return;
     }
 
     ctx.user = user;
