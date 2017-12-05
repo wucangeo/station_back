@@ -48,7 +48,7 @@ class User extends Service {
     result.data = users ? users : [];
     return result;
   }
-  async get(user_id) {
+  async get(user_id, virtual = false) {
     let result = {
       code: 1,
       data: null,
@@ -59,8 +59,12 @@ class User extends Service {
       result.msg = "缺少参数。";
       return result;
     }
+    let vir_attrs = null;
+    if (virtual) {
+      vir_attrs = ["salt", "hash", ...attrs];
+    }
     var query = {
-      attributes: attrs,
+      attributes: vir_attrs || attrs,
       where: {
         data_id: user_id
       }
@@ -70,7 +74,37 @@ class User extends Service {
     result.data = user;
     return result;
   }
-  async create(item) {
+  async findOne(findInfo) {
+    let result = {
+      code: 1,
+      data: null,
+      msg: "查询成功。"
+    };
+    let find_where = {};
+    for (let column in findInfo) {
+      if (!column || !findInfo[column]) {
+        continue;
+      }
+      find_where[column] = findInfo[column];
+      if (Object.keys(find_where).length > 0) {
+        break;
+      }
+    }
+    if (Object.keys(find_where).length === 0) {
+      result.code = 0;
+      result.msg = "查询参数错误。";
+      return result;
+    }
+    var query = {
+      attributes: attrs,
+      where: find_where
+    };
+    var user = await this.ctx.model.User.findOne(query);
+
+    result.data = user;
+    return result;
+  }
+  async create(item, user_id = 0) {
     let result = {
       code: 1,
       data: null,
@@ -88,8 +122,8 @@ class User extends Service {
     }
     item.is_admin = item.is_admin ? item.is_admin : 0;
     item.enable = item.enable ? item.enable : 0;
-    item.created_user = item.created_user ? item.created_user : 0;
-    item.updated_user = item.updated_user ? item.updated_user : 0;
+    item.created_user = user_id;
+    item.updated_user = user_id;
     let user_created = await this.ctx.model.User.create(item);
     if (!user_created) {
       result.code = 0;
@@ -99,7 +133,7 @@ class User extends Service {
     result.data = user_created.toJson();
     return result;
   }
-  async update({ data_id, updates }) {
+  async update({ data_id, updates }, user_id = 0) {
     let result = {
       code: 1,
       data: null,
@@ -114,8 +148,7 @@ class User extends Service {
 
     updates.is_admin = updates.is_admin ? updates.is_admin : 0;
     updates.enable = updates.enable ? updates.enable : 0;
-    updates.created_user = updates.created_user ? updates.created_user : 0;
-    updates.updated_user = updates.updated_user ? updates.updated_user : 0;
+    updates.updated_user = user_id;
 
     let user_updated = await user.update(updates);
     result.data = user_updated.toJson();
