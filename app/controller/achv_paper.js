@@ -17,8 +17,8 @@ class AchvPaperController extends Controller {
   }
   async get() {
     const { ctx, service } = this;
-    let id = ctx.params.id;
-    let data = await service.achvPaper.get(id);
+    let data_id = ctx.params.data_id;
+    let data = await service.achvPaper.get(data_id);
     if (data) {
       this.ctx.body = {
         data: data,
@@ -33,9 +33,10 @@ class AchvPaperController extends Controller {
   }
   async create() {
     const { ctx, service } = this;
+    let user_id = ctx.user && ctx.user.data_id ? ctx.user.data_id : 0;
     var item = ctx.request.body;
 
-    let result = await ctx.service.achvPaper.create(item);
+    let result = await ctx.service.achvPaper.create(item, user_id);
     if (result) {
       this.ctx.body = {
         status: 200,
@@ -46,9 +47,13 @@ class AchvPaperController extends Controller {
   }
   async update() {
     const { ctx, service } = this;
-    const id = ctx.params.id;
+    let user_id = ctx.user && ctx.user.data_id ? ctx.user.data_id : 0;
+    const data_id = ctx.params.data_id;
     const item = ctx.request.body;
-    var result = await service.achvPaper.update({ id, updates: item });
+    var result = await service.achvPaper.update(
+      { data_id, updates: item },
+      user_id
+    );
     if (!result) {
       this.ctx.body = {
         status: 400,

@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const Service = require("egg").Service;
-let attrs = ["id", "year", "title", "journal", "author", "journal_level"];
+let attrs = ["data_id", "year", "title", "journal", "author", "journal_level"];
 class AchvPaper extends Service {
   async list({
     key = null,
@@ -24,24 +24,24 @@ class AchvPaper extends Service {
     }
     return this.ctx.model.AchvPaper.findAndCountAll(query);
   }
-  async get(id) {
+  async get(data_id) {
     var query = {
       where: {
-        id: id
+        data_id: data_id
       }
     };
     var paper = this.ctx.model.AchvPaper.findOne(query);
     return paper;
   }
-  async create(item) {
+  async create(item, user_id = 0) {
     item.year = item.year ? item.year : null;
     item.rank_depart = item.rank_depart ? item.rank_depart : null;
     item.rank_author = item.rank_author ? item.rank_author : null;
     item.index = item.index ? item.index : null;
     item.is_coop = item.is_coop ? item.is_coop : null;
     item.enable = item.enable ? item.enable : 1;
-    item.created_user = item.created_user ? item.created_user : 0;
-    item.updated_user = item.updated_user ? item.updated_user : 0;
+    item.created_user = user_id;
+    item.updated_user = user_id;
     let result = await this.ctx.model.AchvPaper.create(item);
     if (result) {
       result = JSON.parse(JSON.stringify(result));
@@ -49,8 +49,8 @@ class AchvPaper extends Service {
     }
     return result;
   }
-  async update({ id, updates }) {
-    const paper = await this.ctx.model.AchvPaper.findById(id);
+  async update({ data_id, updates }, user_id = 0) {
+    const paper = await this.ctx.model.AchvPaper.findById(data_id);
     if (!paper) {
       return false;
     }
@@ -60,8 +60,7 @@ class AchvPaper extends Service {
     updates.index = updates.index ? updates.index : null;
     updates.is_coop = updates.is_coop ? updates.is_coop : null;
     updates.enable = updates.enable ? updates.enable : 1;
-    updates.created_user = updates.created_user ? updates.created_user : 0;
-    updates.updated_user = updates.updated_user ? updates.updated_user : 0;
+    updates.updated_user = user_id;
 
     let result = await paper.update(updates);
     result.password = null;
@@ -70,7 +69,7 @@ class AchvPaper extends Service {
   }
   async delete(ids) {
     const papers = await this.ctx.model.AchvPaper.destroy({
-      where: { id: { $in: ids } }
+      where: { data_id: { $in: ids } }
     });
     if (!papers) {
       return false;

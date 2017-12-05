@@ -3,7 +3,7 @@ module.exports = app => {
   const AchvPaper = app.model.define(
     "achv_paper",
     {
-      id: {
+      data_id: {
         type: INTEGER,
         primaryKey: true,
         autoIncrement: true
