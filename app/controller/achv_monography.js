@@ -1,90 +1,48 @@
 const Controller = require("egg").Controller;
+
 class AchvMonographyController extends Controller {
   async list() {
     const { ctx, service } = this;
-    let datas = await ctx.service.achvMonography.list(ctx.query);
-    if (datas) {
-      this.ctx.body = {
-        data: datas,
-        status: 200
-      };
-    } else {
-      this.ctx.body = {
-        status: 400,
-        msg: "查询失败"
-      };
-    }
+    let query = ctx.query;
+    query.offset = query.start ? parseInt(query.start) : 0;
+    query.limit = query.row ? parseInt(query.row) : 10;
+    query.order = query.order ? parseInt(query.order) : 0;
+    const result = await service.achvMonography.list(query);
+    ctx.body = result;
   }
   async get() {
     const { ctx, service } = this;
-    let id = ctx.params.id;
-    let data = await service.achvMonography.get(id);
-    if (data) {
-      this.ctx.body = {
-        data: data,
-        status: 200
-      };
-    } else {
-      this.ctx.body = {
-        status: 404,
-        msg: "未查询到结果。"
-      };
-    }
+    const { validator } = this.app;
+    let result = await service.achvMonography.get(ctx.params.data_id);
+    ctx.body = result;
   }
   async create() {
     const { ctx, service } = this;
-    var item = ctx.request.body;
+    let user_id = ctx.user && ctx.user.data_id ? ctx.user.data_id : 0;
 
-    let result = await ctx.service.achvMonography.create(item);
-    if (result) {
-      this.ctx.body = {
-        status: 200,
-        data: result,
-        msg: null
-      };
-    }
+    //创建
+    var item = ctx.request.body;
+    let result = await ctx.service.achvMonography.create(item, user_id);
+    ctx.body = result;
   }
   async update() {
     const { ctx, service } = this;
-    const id = ctx.params.id;
+    let user_id = ctx.user && ctx.user.data_id ? ctx.user.data_id : 0;
+
+    const data_id = ctx.params.data_id;
     const item = ctx.request.body;
-    var result = await service.achvMonography.update({ id, updates: item });
-    if (!result) {
-      this.ctx.body = {
-        status: 400,
-        msg: "更新失败。"
-      };
-      return;
-    }
-    this.ctx.body = {
-      status: 200,
-      msg: "更新成功",
-      data: result
-    };
+    var result = await service.achvMonography.update(
+      { data_id, updates: item },
+      user_id
+    );
+
+    ctx.body = result;
   }
   async delete() {
     const { ctx, service } = this;
-    if (!ctx.request.body) {
-      ctx.body = {
-        status: 400,
-        msg: "参数错误。"
-      };
-    }
-    const ids = JSON.parse(ctx.request.body.ids);
-    let result = await service.achvMonography.delete(ids);
-    if (!result) {
-      ctx.body = {
-        status: 300,
-        data: null,
-        msg: "删除失败！"
-      };
-    }
-    ctx.body = {
-      status: 200,
-      data: result,
-      msg: "删除成功！"
-    };
+    let result = await service.achvMonography.delete(ctx.request.body.ids);
+
+    ctx.body = result;
   }
 }
-
 module.exports = AchvMonographyController;

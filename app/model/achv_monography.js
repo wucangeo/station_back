@@ -3,7 +3,7 @@ module.exports = app => {
   const AchvMonography = app.model.define(
     "achv_monography",
     {
-      id: {
+      data_id: {
         type: INTEGER,
         primaryKey: true,
         autoIncrement: true
