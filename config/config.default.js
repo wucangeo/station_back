@@ -20,7 +20,31 @@ module.exports = appInfo => {
     host: "localhost",
     port: "3306",
     username: "root",
-    password: "noroot"
+    password: "noroot",
+    timezone: "+08:00"
+  };
+
+  //返回结果中的msg
+  config.msg = {
+    err_param: "参数错误。",
+    list: {
+      succ: "查询成功。"
+    },
+    get: {
+      succ: "查询成功。"
+    },
+    create: {
+      succ: "创建成功。",
+      err: "创建失败。"
+    },
+    update: {
+      succ: "更新成功。",
+      err_find: "未找到数据。"
+    },
+    delete: {
+      succ: "删除成功。",
+      err: "删除失败。"
+    }
   };
 
   return config;

@@ -1,129 +1,243 @@
-const crypto = require("crypto");
 const Service = require("egg").Service;
-let attrs = ["data_id", "year", "title", "journal", "author", "journal_level"];
+let attrs = [
+  "data_id",
+  "year",
+  "title",
+  "journal",
+  "author",
+  "journal_level",
+  "created_at"
+];
+
 class AchvPaper extends Service {
   async list({
-    key = null,
+    key = "",
     offset = 0,
     limit = 10,
     order_by = "created_at",
-    order = "ASC"
+    order = 0
   }) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
     let result = {
       code: 1,
       data: null,
-      msg: "查询成功。"
+      msg: msg.list.succ
     };
-    var query = {
-      attributes: attrs
-    };
+    //参数验证
+    let error = validator.validate(
+      {
+        key: { type: "string", allowEmpty: true },
+        offset: { type: "int" },
+        limit: { type: "int" },
+        order: { type: "enum", values: [0, 1] },
+        order_by: {
+          type: "enum",
+          values: attrs
+        }
+      },
+      { key, offset, limit, order, order_by }
+    );
+    if (error) {
+      result.code = 0;
+      result.msg = msg.err_param;
+      result.data = error;
+      return result;
+    }
+    //组织查询参数
+    var query = {};
     if (key) {
       query.where = { name: { $like: "%" + key + "%" } };
     }
-    if (parseInt(offset) != null && parseInt(limit) != null) {
-      query.offset = parseInt(offset);
-      query.limit = parseInt(limit);
-    }
-    if (order_by && order) {
-      query.order = [[order_by, order.toUpperCase()]];
-    }
-    let papers = await this.ctx.model.AchvPaper.findAndCountAll(query);
-    result.data = papers ? papers : [];
+    query.offset = offset;
+    query.limit = limit;
+    order = order === 1 ? "DESC" : "ASC";
+    query.order = [[order_by, order]];
+    //查询
+    let datas = await ctx.model.AchvPaper.findAndCountAll(query);
+    result.data = datas ? datas : [];
+
     return result;
   }
   async get(data_id) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
+
     let result = {
       code: 1,
       data: null,
-      msg: "查询成功。"
+      msg: msg.get.succ
     };
-    if (!data_id) {
+    data_id = parseInt(data_id);
+    //参数验证
+    let error = validator.validate(
+      {
+        data_id: { type: "int", required: true }
+      },
+      { data_id }
+    );
+    if (error) {
       result.code = 0;
-      result.msg = "缺少参数。";
+      result.msg = msg.err_param;
+      result.data = error;
       return result;
     }
+    //组织查询参数
     var query = {
       where: {
         data_id: data_id
       }
     };
-    var paper = await this.ctx.model.AchvPaper.findOne(query);
-    result.data = paper;
+    //查询
+    var achvPaper = await ctx.model.AchvPaper.findOne(query);
+
+    result.data = achvPaper;
     return result;
   }
   async create(item, user_id = 0) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
     let result = {
       code: 1,
       data: null,
-      msg: "创建成功。"
+      msg: msg.create.succ
     };
-    item.year = item.year ? item.year : null;
-    item.rank_depart = item.rank_depart ? item.rank_depart : null;
-    item.rank_author = item.rank_author ? item.rank_author : null;
-    item.index = item.index ? item.index : null;
-    item.is_coop = item.is_coop ? item.is_coop : null;
-    item.enable = item.enable ? item.enable : 1;
+    //参数验证
+    let error = validator.validate(
+      {
+        year: { type: "int", required: false, allowEmpty: true },
+        title: { type: "string", required: false, allowEmpty: true },
+        journal: { type: "string", required: false, allowEmpty: true },
+        volume: { type: "string", required: false, allowEmpty: true },
+        issue_number: { type: "string", required: false, allowEmpty: true },
+        author: { type: "string", required: false, allowEmpty: true },
+        co_author: { type: "string", required: false, allowEmpty: true },
+        abstract: { type: "string", required: false, allowEmpty: true },
+        rank_depart: { type: "int", required: false, allowEmpty: true },
+        rank_author: { type: "int", required: false, allowEmpty: true },
+        journal_level: { type: "string", required: false, allowEmpty: true },
+        index: { type: "number", required: false, allowEmpty: true },
+        is_coop: { type: "int", required: false, allowEmpty: true },
+        file_path: { type: "string", required: false, allowEmpty: true },
+        remark: { type: "string", required: false, allowEmpty: true },
+        enable: { type: "int", required: false, allowEmpty: true }
+      },
+      item
+    );
+    if (error) {
+      result.code = 0;
+      result.msg = msg.err_param;
+      result.data = error;
+      return result;
+    }
+    //组织查询参数
     item.created_user = user_id;
     item.updated_user = user_id;
-    let data_created = await this.ctx.model.AchvPaper.create(item);
+    //查询
+    let data_created = await ctx.model.AchvPaper.create(item);
     if (!data_created) {
       result.code = 0;
-      result.msg = "创建失败！";
+      result.msg = msg.create.err;
       return result;
     }
     result.data = data_created;
     return result;
   }
   async update({ data_id, updates }, user_id = 0) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
     let result = {
       code: 1,
       data: null,
-      msg: "更新成功。"
+      msg: msg.update.succ
     };
-    const paper = await this.ctx.model.AchvPaper.findById(data_id);
-    if (!paper) {
+    data_id = parseInt(data_id);
+    //参数验证
+    let error = validator.validate(
+      {
+        data_id: { type: "int", required: true, allowEmpty: false },
+        year: { type: "int", required: false, allowEmpty: true },
+        title: { type: "string", required: false, allowEmpty: true },
+        journal: { type: "string", required: false, allowEmpty: true },
+        volume: { type: "string", required: false, allowEmpty: true },
+        issue_number: { type: "string", required: false, allowEmpty: true },
+        author: { type: "string", required: false, allowEmpty: true },
+        co_author: { type: "string", required: false, allowEmpty: true },
+        abstract: { type: "string", required: false, allowEmpty: true },
+        rank_depart: { type: "int", required: false, allowEmpty: true },
+        rank_author: { type: "int", required: false, allowEmpty: true },
+        journal_level: { type: "string", required: false, allowEmpty: true },
+        index: { type: "double", required: false, allowEmpty: true },
+        is_coop: { type: "int", required: false, allowEmpty: true },
+        file_path: { type: "string", required: false, allowEmpty: true },
+        remark: { type: "string", required: false, allowEmpty: true },
+        enable: { type: "int", required: false, allowEmpty: true }
+      },
+      { data_id, ...updates }
+    );
+    if (error) {
       result.code = 0;
-      result.msg = "未找到数据。";
+      result.msg = msg.err_param;
+      result.data = error;
       return result;
     }
-    updates.year = updates.year ? updates.year : null;
-    updates.rank_depart = updates.rank_depart ? updates.rank_depart : null;
-    updates.rank_author = updates.rank_author ? updates.rank_author : null;
-    updates.index = updates.index ? updates.index : null;
-    updates.is_coop = updates.is_coop ? updates.is_coop : null;
-    updates.enable = updates.enable ? updates.enable : 1;
+    //data_id有效性验证
+    let achvPaper = await ctx.model.AchvPaper.findById(data_id);
+    if (!achvPaper) {
+      result.code = 0;
+      result.msg = msg.err_find;
+      return result;
+    }
+    //组织查询参数
     updates.updated_user = user_id;
-
-    let data_updated = await paper.update(updates);
-    if (!data_updated) {
-      result.code = 0;
-      result.msg = "更新失败。";
-      return result;
-    }
+    //查询
+    let data_updated = await achvPaper.update(updates);
     result.data = data_updated;
+
     return result;
   }
   async delete(ids) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
     let result = {
       code: 1,
       data: null,
-      msg: "删除成功。"
+      msg: msg.delete.succ
     };
-    if (!ids) {
+    //参数验证
+    try {
+      ids = JSON.parse(ids);
+    } catch (ex) {
+      ids = null;
+    }
+    let error = validator.validate(
+      {
+        ids: { type: "array", required: true }
+      },
+      { ids }
+    );
+    if (error) {
       result.code = 0;
-      result.msg = "参数错误。";
+      result.msg = msg.err_param;
+      result.data = error;
       return result;
     }
-    ids = JSON.parse(ids);
-    const data_deleted = await this.ctx.model.AchvPaper.destroy({
+    //查询
+    const data_deleted = await ctx.model.AchvPaper.destroy({
       where: { data_id: { $in: ids } }
     });
     if (!data_deleted) {
       result.code = 0;
-      result.msg = "删除失败";
+      result.msg = msg.delete.err;
       return result;
     }
     result.data = data_deleted;
+
     return result;
   }
 }
