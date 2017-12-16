@@ -42,6 +42,14 @@ class UserController extends Controller {
 
     ctx.body = result;
   }
+  async register() {
+    const { ctx, service } = this;
+    let user_id = 0;
+    var item = ctx.request.body;
+    let result = await ctx.service.user.create(item, user_id);
+
+    this.ctx.body = result;
+  }
   async verify() {
     ctx.body = {
       code: 1,

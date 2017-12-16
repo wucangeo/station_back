@@ -2,7 +2,7 @@ var jwt = require("jsonwebtoken");
 
 module.exports = options => {
   return async function auth(ctx, next) {
-    let whiteList = ["/", "/api/v1/user/login"];
+    let whiteList = ["/", "/api/v1/user/login", "/api/v1/user/register"];
     if (whiteList.includes(ctx.path)) {
       await next();
       return;
@@ -40,6 +40,7 @@ module.exports = options => {
         data: null,
         msg: "用户不存在"
       };
+      return;
     }
     if (user.enable === 0) {
       ctx.status = 401;

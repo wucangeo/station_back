@@ -13,6 +13,7 @@ module.exports = app => {
   router.get(api_v1 + "/user", controller.user.list);
   router.get(api_v1 + "/user/:data_id", controller.user.get);
   router.post(api_v1 + "/user", controller.user.create);
+  router.post(api_v1 + "/user/register", controller.user.register);
   router.post(api_v1 + "/user/login", controller.user.login);
   router.patch(api_v1 + "/user/:data_id", controller.user.update);
   router.delete(api_v1 + "/user", controller.user.delete);
