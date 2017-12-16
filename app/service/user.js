@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const Service = require("egg").Service;
 let attrs = [
   "data_id",
@@ -121,14 +123,19 @@ class User extends Service {
       result.msg = "缺少用户名。";
       return result;
     }
+    //如果没有密码，则默认为123456
     if (!item.password) {
-      result.code = 0;
-      result.msg = "缺少密码。";
-      return result;
+      let md5 = crypto.createHash("md5");
+      let md5_123456 = md5.update("123456bnu").digest("hex");
+      item.password = md5_123456;
     }
     item.name = item.name ? item.name : item.username;
     item.is_admin = item.is_admin ? item.is_admin : 0;
     item.enable = item.enable ? item.enable : 0;
+    if (user_id === 0) {
+      item.is_admin = 0;
+      item.enable = 0;
+    }
     item.created_user = user_id;
     item.updated_user = user_id;
     let user_created = await this.ctx.model.User.create(item);
@@ -153,8 +160,6 @@ class User extends Service {
       return result;
     }
 
-    updates.is_admin = updates.is_admin ? updates.is_admin : 0;
-    updates.enable = updates.enable ? updates.enable : 0;
     updates.updated_user = user_id;
 
     let user_updated = await user.update(updates);
@@ -167,17 +172,27 @@ class User extends Service {
     return result;
   }
   async delete(ids) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
     let result = {
       code: 1,
       data: null,
       msg: "删除成功。"
     };
-    if (!ids) {
+    //参数验证
+    let error = validator.validate(
+      {
+        ids: { type: "object", required: true }
+      },
+      { ids }
+    );
+    if (error) {
       result.code = 0;
-      result.msg = "参数错误。";
+      result.msg = msg.err_param;
+      result.data = error;
       return result;
     }
-    ids = JSON.parse(ids);
+    //开始删除
     const users = await this.ctx.model.User.destroy({
       where: { data_id: { $in: ids } }
     });
@@ -203,7 +218,7 @@ class User extends Service {
     var user = await this.ctx.model.User.findOne(query);
     if (!user) {
       result.code = 0;
-      result.msg = "未找到该用户。";
+      result.msg = "用户名不存在。";
       return result;
     }
     if (user.enable === 0) {
