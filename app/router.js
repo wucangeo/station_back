@@ -16,6 +16,7 @@ module.exports = app => {
   router.post(api_v1 + "/user/login", controller.user.login);
   router.patch(api_v1 + "/user/:data_id", controller.user.update);
   router.delete(api_v1 + "/user", controller.user.delete);
+  router.get(api_v1 + "/user/verify", controller.user.verify);
 
   //数据管理
   router.get(api_v1 + "/data", controller.data.list);

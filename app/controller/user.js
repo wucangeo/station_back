@@ -40,7 +40,14 @@ class UserController extends Controller {
     let { username, password } = ctx.request.body;
     var result = await ctx.service.user.login(username, password);
 
-    this.ctx.body = result;
+    ctx.body = result;
+  }
+  async verify() {
+    ctx.body = {
+      code: 1,
+      msg: "验证成功。",
+      data: null
+    };
   }
 }
 
