@@ -27,7 +27,7 @@ module.exports = options => {
       ctx.body = {
         code: 0,
         data: null,
-        msg: "access_token不符合标准。"
+        msg: "access_token无效。"
       };
       return;
     }
@@ -41,7 +41,7 @@ module.exports = options => {
         msg: "用户不存在"
       };
     }
-    if (!user.enable) {
+    if (user.enable === 0) {
       ctx.status = 401;
       ctx.body = {
         code: 0,
@@ -50,12 +50,13 @@ module.exports = options => {
       };
       return;
     }
-    let res_verify = jwt.verify(access_token, user.salt);
-    if (!res_verify) {
+    try {
+      jwt.verify(access_token, user.salt);
+    } catch (err) {
       ctx.status = 401;
       ctx.body = {
         code: 0,
-        data: null,
+        data: err,
         msg: "access_token无效。"
       };
       return;
