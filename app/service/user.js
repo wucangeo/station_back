@@ -33,7 +33,13 @@ class User extends Service {
       virtual: false
     };
     if (key) {
-      query.where = { name: { $like: "%" + key + "%" } };
+      query.where = {
+        $or: [
+          { name: { $like: "%" + key + "%" } },
+          { username: { $like: "%" + key + "%" } },
+          { department: { $like: "%" + key + "%" } }
+        ]
+      };
     }
     if (parseInt(offset) != null && parseInt(limit) != null) {
       query.offset = parseInt(offset);
@@ -120,6 +126,7 @@ class User extends Service {
       result.msg = "缺少密码。";
       return result;
     }
+    item.name = item.name ? item.name : item.username;
     item.is_admin = item.is_admin ? item.is_admin : 0;
     item.enable = item.enable ? item.enable : 0;
     item.created_user = user_id;
@@ -197,6 +204,11 @@ class User extends Service {
     if (!user) {
       result.code = 0;
       result.msg = "未找到该用户。";
+      return result;
+    }
+    if (user.enable === 0) {
+      result.code = 0;
+      result.msg = "用户未认证，请联系管理员。";
       return result;
     }
     let verify = await user.validPassword(password);
