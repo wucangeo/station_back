@@ -149,7 +149,7 @@ class Station extends Service {
     let error = validator.validate(
       {
         data_id: { type: "int", required: true, allowEmpty: false },
-        title: { type: "string", required: true },
+        title: { type: "string", required: false },
         type: { type: "int", required: false },
         content: { type: "string", required: false },
         enable: { type: "boolean", required: false }
