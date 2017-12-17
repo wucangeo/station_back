@@ -6,7 +6,6 @@ class UploadController extends Controller {
   async list() {
     const { ctx, service } = this;
     let query = ctx.query;
-    query.type = query.type ? parseInt(query.type) : 0;
     query.offset = query.offset ? parseInt(query.offset) : 0;
     query.limit = query.limit ? parseInt(query.limit) : 10;
     query.order = query.order ? parseInt(query.order) : 0;

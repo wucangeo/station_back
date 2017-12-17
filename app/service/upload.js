@@ -18,7 +18,7 @@ let attrs = [
 
 class Upload extends Service {
   async list({
-    type = 1,
+    key = 1,
     offset = 0,
     limit = 1,
     order_by = "created_at",
@@ -35,7 +35,7 @@ class Upload extends Service {
     //参数验证
     let error = validator.validate(
       {
-        type: { type: "int", allowEmpty: false, required: true },
+        key: { type: "string", allowEmpty: true, required: false },
         offset: { type: "int" },
         limit: { type: "int" },
         order: { type: "enum", values: [0, 1] },
@@ -44,7 +44,7 @@ class Upload extends Service {
           values: attrs
         }
       },
-      { type, offset, limit, order, order_by }
+      { key, offset, limit, order, order_by }
     );
     if (error) {
       result.code = 0;
@@ -55,7 +55,7 @@ class Upload extends Service {
     //组织查询参数
     order = order === 1 ? "DESC" : "ASC";
     var query = {
-      where: { name: name },
+      where: { name: { $like: "%" + key + "%" } },
       offset: offset,
       limit: limit,
       order: [[order_by, order]]
