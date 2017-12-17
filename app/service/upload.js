@@ -239,12 +239,6 @@ class Upload extends Service {
     }
 
     let filename = encodeURIComponent(stream.filename);
-    if (!filename) {
-      result.code = 0;
-      result.msg = config.msg.upload.err_find;
-      return result;
-    }
-
     let pathObj = path.parse(filename);
     let pathStore = "app/public/upload";
     let pathDatabase = "/public/upload";
@@ -276,8 +270,20 @@ class Upload extends Service {
     } else if (exts.video.includes(extension)) {
       fileType = "video";
     }
-    pathStore = path.join(pathStore, fileType, filename);
-    pathDatabase = path.join(pathDatabase, fileType, filename);
+    //随机图片名称
+    let randomStr = Math.random()
+      .toString(36)
+      .substring(7);
+    let datetimeStr = new Date()
+      .toISOString()
+      .replace(/T/, "_")
+      .replace(/:/g, "_")
+      .replace(/-/g, "_")
+      .replace(/\..+/, "");
+    let newFilename = datetimeStr + "_" + randomStr + extension;
+    //存储路径;
+    pathStore = path.join(pathStore, fileType, newFilename);
+    pathDatabase = path.join(pathDatabase, fileType, newFilename);
 
     const writeStream = fs.createWriteStream(pathStore);
     try {
