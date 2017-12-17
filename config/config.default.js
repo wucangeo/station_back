@@ -13,6 +13,11 @@ module.exports = appInfo => {
     domainWhiteList: ["http://localhost:8080"]
   };
 
+  config.multipart = {
+    fileSize: "50mb",
+    fileExtensions: []
+  };
+
   //database
   config.sequelize = {
     dialect: "mysql", // support: mysql, mariadb, postgres, mssql
@@ -44,6 +49,11 @@ module.exports = appInfo => {
     delete: {
       succ: "删除成功。",
       err: "删除失败。"
+    },
+    upload: {
+      succ: "上传成功。",
+      err: "上传失败",
+      err_find: "未找到上传数据。"
     }
   };
 
