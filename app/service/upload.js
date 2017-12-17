@@ -274,13 +274,13 @@ class Upload extends Service {
     let randomStr = Math.random()
       .toString(36)
       .substring(7);
-    let datetimeStr = new Date()
+    let datetimeStr = new Date(Date.now() + 28800000)
       .toISOString()
-      .replace(/T/, "_")
-      .replace(/:/g, "_")
-      .replace(/-/g, "_")
-      .replace(/\..+/, "");
-    let newFilename = datetimeStr + "_" + randomStr + extension;
+      .replace(/T/, "")
+      .replace(/:/g, "")
+      .replace(/-/g, "")
+      .replace(/\..+/, ""); //获取本地时间：20171217213010
+    let newFilename = datetimeStr + "_" + randomStr + extension; //20171217213010_bc69fg.jpg
     //存储路径;
     pathStore = path.join(pathStore, fileType, newFilename);
     pathDatabase = path.join(pathDatabase, fileType, newFilename);
