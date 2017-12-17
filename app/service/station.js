@@ -13,6 +13,7 @@ let attrs = [
 
 class Station extends Service {
   async list({
+    key = "",
     type = 1,
     offset = 0,
     limit = 1,
@@ -50,7 +51,10 @@ class Station extends Service {
     //组织查询参数
     order = order === 1 ? "DESC" : "ASC";
     var query = {
-      where: { type: type },
+      where: {
+        type: type,
+        title: { $like: "%" + key + "%" }
+      },
       offset: offset,
       limit: limit,
       order: [[order_by, order]]
