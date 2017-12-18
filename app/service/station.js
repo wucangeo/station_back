@@ -191,11 +191,6 @@ class Station extends Service {
       msg: msg.delete.succ
     };
     //参数验证
-    try {
-      ids = JSON.parse(ids);
-    } catch (ex) {
-      ids = null;
-    }
     let error = validator.validate(
       {
         ids: { type: "object", required: true }
