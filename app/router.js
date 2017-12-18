@@ -34,6 +34,13 @@ module.exports = app => {
   router.delete(api_v1 + "/upload", controller.upload.delete);
   router.post(api_v1 + "/upload/upload", controller.upload.upload);
 
+  //站点管理
+  router.get(api_v1 + "/news", controller.news.list);
+  router.get(api_v1 + "/news/:data_id", controller.news.get);
+  router.post(api_v1 + "/news", controller.news.create);
+  router.patch(api_v1 + "/news/:data_id", controller.news.update);
+  router.delete(api_v1 + "/news", controller.news.delete);
+
   //数据管理
   router.get(api_v1 + "/data", controller.data.list);
   router.get(api_v1 + "/data/:data_id", controller.data.get);
