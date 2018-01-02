@@ -9,7 +9,9 @@ let attrs = [
   "name",
   "size",
   "path",
-  "ext",
+  "type",
+  "order",
+  "tag",
   "enable",
   "updated_user",
   "updated_at",
@@ -17,7 +19,7 @@ let attrs = [
   "created_at"
 ];
 
-class Upload extends Service {
+class Image extends Service {
   async list({
     key = 1,
     offset = 0,
@@ -62,7 +64,7 @@ class Upload extends Service {
       order: [[order_by, order]]
     };
     //查询
-    let datas = await ctx.model.Upload.findAndCountAll(query);
+    let datas = await ctx.model.Image.findAndCountAll(query);
     result.data = datas ? datas : [];
 
     return result;
@@ -98,9 +100,9 @@ class Upload extends Service {
       }
     };
     //查询
-    var upload = await ctx.model.Upload.findOne(query);
+    var image = await ctx.model.Image.findOne(query);
 
-    result.data = upload;
+    result.data = image;
     return result;
   }
   async create(item, user_id = 0) {
@@ -118,7 +120,9 @@ class Upload extends Service {
         name: { type: "string", required: false },
         size: { type: "int", required: false },
         path: { type: "string", required: false },
-        ext: { type: "string", required: false },
+        order: { type: "string", required: false },
+        tag: { type: "string", required: false },
+        type: { type: "string", required: false },
         enable: { type: "boolean", required: false }
       },
       item
@@ -133,7 +137,7 @@ class Upload extends Service {
     item.created_user = user_id;
     item.updated_user = user_id;
     //查询
-    let data_created = await ctx.model.Upload.create(item);
+    let data_created = await ctx.model.Image.create(item);
     if (!data_created) {
       result.code = 0;
       result.msg = msg.create.err;
@@ -159,6 +163,9 @@ class Upload extends Service {
         name: { type: "string", required: false },
         size: { type: "int", required: false },
         path: { type: "string", required: false },
+        order: { type: "string", required: false },
+        tag: { type: "string", required: false },
+        type: { type: "string", required: false },
         enable: { type: "boolean", required: false }
       },
       { data_id, ...updates }
@@ -170,8 +177,8 @@ class Upload extends Service {
       return result;
     }
     //data_id有效性验证
-    const upload = await ctx.model.Upload.findById(data_id);
-    if (!upload) {
+    const image = await ctx.model.Image.findById(data_id);
+    if (!image) {
       result.code = 0;
       result.msg = msg.err_find;
       return result;
@@ -179,7 +186,7 @@ class Upload extends Service {
     //组织查询参数
     updates.updated_user = user_id;
     //查询
-    let data_updated = await upload.update(updates);
+    let data_updated = await image.update(updates);
     result.data = data_updated;
 
     return result;
@@ -194,11 +201,6 @@ class Upload extends Service {
       msg: msg.delete.succ
     };
     //参数验证
-    try {
-      ids = JSON.parse(ids);
-    } catch (ex) {
-      ids = null;
-    }
     let error = validator.validate(
       {
         ids: { type: "object", required: true }
@@ -212,7 +214,7 @@ class Upload extends Service {
       return result;
     }
     //查询
-    const data_deleted = await ctx.model.Upload.destroy({
+    const data_deleted = await ctx.model.Image.destroy({
       where: { data_id: { $in: ids } }
     });
     if (!data_deleted) {
@@ -241,36 +243,28 @@ class Upload extends Service {
 
     let filename = encodeURIComponent(stream.filename);
     let pathObj = path.parse(filename);
-    let pathStore = "app/public/upload";
-    let pathDatabase = "/public/upload";
+    let pathStore = "app/public/image";
+    let pathDatabase = "/public/image";
     let extension = pathObj.ext.toLowerCase();
-    let fileType = "default";
-    let exts = {
-      image: [
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".gif",
-        ".bmp",
-        ".wbmp",
-        ".webp",
-        ".tif",
-        ".psd"
-      ],
-      office: [".doc", ".docx", ".ppt", ".pptx", ".pdf", ".xls", ".xlsx"],
-      zip: [".zip", "rar", ".gz", ".tgz", ".gzip"],
-      video: [".mp3", ".mp4", ".avi"]
-    };
-    //image
-    if (exts.image.includes(extension)) {
-      fileType = "image";
-    } else if (exts.office.includes(extension)) {
-      fileType = "office";
-    } else if (exts.zip.includes(extension)) {
-      fileType = "zip";
-    } else if (exts.video.includes(extension)) {
-      fileType = "video";
+
+    //检测图片格式
+    let supportExtensions = [
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".gif",
+      ".bmp",
+      ".wbmp",
+      ".webp",
+      ".tif",
+      ".psd"
+    ];
+    if (!supportExtensions.includes(extension)) {
+      result.code = 0;
+      result.msg = "图片格式不支持。";
+      return result;
     }
+
     //随机图片名称
     let randomStr = Math.random()
       .toString(36)
@@ -283,18 +277,24 @@ class Upload extends Service {
       .replace(/\..+/, ""); //获取本地时间：20171217213010
     let newFilename = datetimeStr + "_" + randomStr + extension; //20171217213010_bc69fg.jpg
     //存储路径;
-    pathStore = path.join(pathStore, fileType, newFilename);
-    pathDatabase = path.join(pathDatabase, fileType, newFilename);
+    pathStore = path.join(pathStore, newFilename);
+    pathDatabase = path.join(pathDatabase, newFilename);
 
     const writeStream = fs.createWriteStream(pathStore);
     try {
       await awaitWriteStream(stream.pipe(writeStream));
       let fileStat = fs.statSync(pathStore); //文件大小
+      let title = pathObj.name;
+      if (stream.fields.name) {
+        title = stream.fields.name;
+      }
+      let type = stream.fields.type;
+
       result.data = {
-        name: pathObj.name,
+        name: title,
         size: fileStat.size,
         path: pathDatabase,
-        ext: extension
+        type: type
       };
       return result;
     } catch (err) {
@@ -306,4 +306,4 @@ class Upload extends Service {
     }
   }
 }
-module.exports = Upload;
+module.exports = Image;

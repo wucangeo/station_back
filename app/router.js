@@ -26,13 +26,21 @@ module.exports = app => {
   router.patch(api_v1 + "/station/:data_id", controller.station.update);
   router.delete(api_v1 + "/station", controller.station.delete);
 
-  //上传管理
+  //文件上传管理
   router.get(api_v1 + "/upload", controller.upload.list);
   router.get(api_v1 + "/upload/:data_id", controller.upload.get);
   router.post(api_v1 + "/upload", controller.upload.create);
   router.patch(api_v1 + "/upload/:data_id", controller.upload.update);
   router.delete(api_v1 + "/upload", controller.upload.delete);
   router.post(api_v1 + "/upload/upload", controller.upload.upload);
+
+  //图片上传管理
+  router.get(api_v1 + "/image", controller.image.list);
+  router.get(api_v1 + "/image/:data_id", controller.image.get);
+  router.post(api_v1 + "/image", controller.image.create);
+  router.patch(api_v1 + "/image/:data_id", controller.image.update);
+  router.delete(api_v1 + "/image", controller.image.delete);
+  router.post(api_v1 + "/image/upload", controller.image.upload);
 
   //站点管理
   router.get(api_v1 + "/news", controller.news.list);
