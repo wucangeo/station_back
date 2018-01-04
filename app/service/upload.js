@@ -19,7 +19,7 @@ let attrs = [
 
 class Upload extends Service {
   async list({
-    key = 1,
+    keys = {},
     offset = 0,
     limit = 1,
     order_by = "created_at",
@@ -36,7 +36,7 @@ class Upload extends Service {
     //参数验证
     let error = validator.validate(
       {
-        key: { type: "string", allowEmpty: true, required: false },
+        keys: { type: "object", allowEmpty: true, required: false },
         offset: { type: "int" },
         limit: { type: "int" },
         order: { type: "enum", values: [0, 1] },
@@ -45,7 +45,7 @@ class Upload extends Service {
           values: attrs
         }
       },
-      { key, offset, limit, order, order_by }
+      { keys, offset, limit, order, order_by }
     );
     if (error) {
       result.code = 0;
@@ -54,14 +54,21 @@ class Upload extends Service {
       return result;
     }
     //组织查询参数
-    order = order === 1 ? "DESC" : "ASC";
     limit = limit < 0 ? 1000000000 : limit;
+    order = order === 1 ? "DESC" : "ASC";
     var query = {
-      where: { name: { $like: "%" + key + "%" } },
-      offset: offset,
       limit: limit,
-      order: [[order_by, order]]
+      offset: offset,
+      order: [[order_by, order]],
+      where: {}
     };
+    for (var selectKey in keys) {
+      if (selectKey == "name") {
+        query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
+      } else {
+        query.where[selectKey] = keys[selectKey];
+      }
+    }
     //查询
     let datas = await ctx.model.Upload.findAndCountAll(query);
     result.data = datas ? datas : [];

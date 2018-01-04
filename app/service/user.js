@@ -19,7 +19,7 @@ let attrs = [
 
 class User extends Service {
   async list({
-    key = null,
+    keys = {},
     offset = 0,
     limit = 10,
     order_by = "created_at",
@@ -30,27 +30,29 @@ class User extends Service {
       data: null,
       msg: "查询成功。"
     };
+    //组织查询参数
+    limit = limit < 0 ? 1000000000 : limit;
+    order = order === 1 ? "DESC" : "ASC";
     var query = {
       attributes: attrs,
-      virtual: false
+      virtual: false,
+      limit: limit,
+      offset: offset,
+      order: [[order_by, order]],
+      where: {}
     };
-    if (key) {
-      query.where = {
-        $or: [
-          { name: { $like: "%" + key + "%" } },
-          { username: { $like: "%" + key + "%" } },
-          { department: { $like: "%" + key + "%" } }
-        ]
-      };
-    }
-    if (parseInt(offset) != null && parseInt(limit) != null) {
-      limit = limit < 0 ? 1000000000 : limit;
-      query.offset = parseInt(offset);
-      query.limit = parseInt(limit);
-    }
-    if (order_by && order) {
-      order = parseInt(order) === 1 ? "DESC" : "ASC";
-      query.order = [[order_by, order.toUpperCase()]];
+    for (var selectKey in keys) {
+      if (selectKey == "name") {
+        if (keys[selectKey]) {
+          query.where['$or'] = [
+            { name: { $like: "%" + keys[selectKey] + "%" } },
+            { username: { $like: "%" + keys[selectKey] + "%" } },
+            { department: { $like: "%" + keys[selectKey] + "%" } }
+          ]
+        }
+      } else {
+        query.where[selectKey] = keys[selectKey];
+      }
     }
     let users = await this.ctx.model.User.findAndCountAll(query);
 

@@ -4,8 +4,14 @@ class AchvPaperController extends Controller {
   async list() {
     const { ctx, service } = this;
     let query = ctx.query;
-    query.offset = query.start ? parseInt(query.start) : 0;
-    query.limit = query.row ? parseInt(query.row) : 10;
+    if (query.keys) {
+      query.keys =
+        typeof query.keys == "string" ? JSON.parse(query.keys) : query.keys;
+    } else {
+      query.keys = {};
+    }
+    query.offset = query.offset ? parseInt(query.offset) : 0;
+    query.limit = query.limit ? parseInt(query.limit) : 10;
     query.order = query.order ? parseInt(query.order) : 0;
     const result = await service.achvPaper.list(query);
     ctx.body = result;

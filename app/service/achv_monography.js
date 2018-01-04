@@ -11,7 +11,7 @@ let attrs = [
 
 class AchvMonography extends Service {
   async list({
-    key = "",
+    keys = {},
     offset = 0,
     limit = 10,
     order_by = "created_at",
@@ -28,7 +28,7 @@ class AchvMonography extends Service {
     //参数验证
     let error = validator.validate(
       {
-        key: { type: "string", allowEmpty: true },
+        keys: { type: "object", allowEmpty: true },
         offset: { type: "int" },
         limit: { type: "int" },
         order: { type: "enum", values: [0, 1] },
@@ -37,7 +37,7 @@ class AchvMonography extends Service {
           values: attrs
         }
       },
-      { key, offset, limit, order, order_by }
+      { keys, offset, limit, order, order_by }
     );
     if (error) {
       result.code = 0;
@@ -46,15 +46,21 @@ class AchvMonography extends Service {
       return result;
     }
     //组织查询参数
-    var query = {};
-    if (key) {
-      query.where = { name: { $like: "%" + key + "%" } };
-    }
     order = order === 1 ? "DESC" : "ASC";
     limit = limit < 0 ? 1000000000 : limit;
-    query.offset = offset;
-    query.limit = limit;
-    query.order = [[order_by, order]];
+    var query = {
+      offset: offset,
+      limit: limit,
+      order: [[order_by, order]],
+      where: {}
+    };
+    for (var selectKey in keys) {
+      if (selectKey == "name") {
+        query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
+      } else {
+        query.where[selectKey] = keys[selectKey];
+      }
+    }
     //查询
     let datas = await ctx.model.AchvMonography.findAndCountAll(query);
     result.data = datas ? datas : [];
