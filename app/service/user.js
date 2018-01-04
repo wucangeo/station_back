@@ -44,6 +44,7 @@ class User extends Service {
       };
     }
     if (parseInt(offset) != null && parseInt(limit) != null) {
+      limit = limit < 0 ? 1000000000 : limit;
       query.offset = parseInt(offset);
       query.limit = parseInt(limit);
     }

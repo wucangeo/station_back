@@ -55,6 +55,7 @@ class Upload extends Service {
     }
     //组织查询参数
     order = order === 1 ? "DESC" : "ASC";
+    limit = limit < 0 ? 1000000000 : limit;
     var query = {
       where: { name: { $like: "%" + key + "%" } },
       offset: offset,

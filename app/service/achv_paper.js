@@ -51,6 +51,7 @@ class AchvPaper extends Service {
       query.where = { name: { $like: "%" + key + "%" } };
     }
     query.offset = offset;
+    limit = limit < 0 ? 1000000000 : limit;
     query.limit = limit;
     order = order === 1 ? "DESC" : "ASC";
     query.order = [[order_by, order]];

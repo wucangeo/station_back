@@ -50,9 +50,10 @@ class AchvMonography extends Service {
     if (key) {
       query.where = { name: { $like: "%" + key + "%" } };
     }
+    order = order === 1 ? "DESC" : "ASC";
+    limit = limit < 0 ? 1000000000 : limit;
     query.offset = offset;
     query.limit = limit;
-    order = order === 1 ? "DESC" : "ASC";
     query.order = [[order_by, order]];
     //查询
     let datas = await ctx.model.AchvMonography.findAndCountAll(query);
