@@ -10,7 +10,7 @@ module.exports = appInfo => {
   config.middleware = ["auth"];
 
   config.security = {
-    domainWhiteList: ["http://localhost:8080"]
+    domainWhiteList: ["http://localhost:8080", "http://47.93.225.139:7001"]
   };
 
   config.multipart = {
