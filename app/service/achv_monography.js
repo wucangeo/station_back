@@ -55,7 +55,7 @@ class AchvMonography extends Service {
       where: {}
     };
     for (var selectKey in keys) {
-      if (selectKey == "name") {
+      if (["title", "journal", "author", "co_author"].includes(selectKey)) {
         query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
       } else {
         query.where[selectKey] = keys[selectKey];

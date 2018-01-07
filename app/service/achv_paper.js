@@ -55,8 +55,10 @@ class AchvPaper extends Service {
       where: {}
     };
     for (var selectKey in keys) {
-      if (selectKey == "name") {
-        query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
+      if (["title", "journal", "author", "co_author"].includes(selectKey)) {
+        if (keys[selectKey]) {
+          query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
+        }
       } else {
         query.where[selectKey] = keys[selectKey];
       }
@@ -216,12 +218,6 @@ class AchvPaper extends Service {
       data: null,
       msg: msg.delete.succ
     };
-    //参数验证
-    try {
-      ids = JSON.parse(ids);
-    } catch (ex) {
-      ids = null;
-    }
     let error = validator.validate(
       {
         ids: { type: "array", required: true }
