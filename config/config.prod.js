@@ -7,7 +7,7 @@ exports.sequelize = {
   host: "47.93.225.139",
   port: "3306",
   username: "root",
-  password: "noroot",
+  password: "123456",
   timezone: "+08:00"
 };
 
