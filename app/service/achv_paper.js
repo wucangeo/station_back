@@ -180,7 +180,7 @@ class AchvPaper extends Service {
         rank_depart: { type: "int", required: false, allowEmpty: true },
         rank_author: { type: "int", required: false, allowEmpty: true },
         journal_level: { type: "string", required: false, allowEmpty: true },
-        index: { type: "double", required: false, allowEmpty: true },
+        index: { type: "number", required: false, allowEmpty: true },
         is_coop: { type: "int", required: false, allowEmpty: true },
         file_path: { type: "string", required: false, allowEmpty: true },
         remark: { type: "string", required: false, allowEmpty: true },
