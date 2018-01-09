@@ -9,10 +9,13 @@ exports.sequelize = {
   username: "root",
   password: "noroot",
   timezone: "+08:00",
+  dialectOptions: {
+    timeout: 30
+  },
   pool: {
     max: 5,
     min: 0,
-    idle: 1 // Keep this very low or it'll make all Lambda requests take longer
+    idle: 30000
   },
 };
 
