@@ -8,7 +8,12 @@ exports.sequelize = {
   port: "3306",
   username: "root",
   password: "noroot",
-  timezone: "+08:00"
+  timezone: "+08:00",
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 1 // Keep this very low or it'll make all Lambda requests take longer
+  },
 };
 
 exports.cors = {
