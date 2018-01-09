@@ -8,6 +8,7 @@ let attrs = [
   "data_id",
   "name",
   "size",
+  "type",
   "path",
   "ext",
   "enable",
@@ -125,6 +126,7 @@ class Upload extends Service {
       {
         name: { type: "string", required: false },
         size: { type: "int", required: false },
+        type: { type: "int", required: false },
         path: { type: "string", required: false },
         ext: { type: "string", required: false },
         enable: { type: "boolean", required: false }
@@ -166,6 +168,7 @@ class Upload extends Service {
         data_id: { type: "int", required: true, allowEmpty: false },
         name: { type: "string", required: false },
         size: { type: "int", required: false },
+        type: { type: "int", required: false },
         path: { type: "string", required: false },
         enable: { type: "boolean", required: false }
       },
@@ -247,7 +250,7 @@ class Upload extends Service {
       return result;
     }
 
-    let filename = encodeURIComponent(stream.filename);
+    let filename = stream.filename;
     let pathObj = path.parse(filename);
     let pathStore = "app/public/upload";
     let pathDatabase = "/public/upload";
@@ -298,10 +301,12 @@ class Upload extends Service {
     try {
       await awaitWriteStream(stream.pipe(writeStream));
       let fileStat = fs.statSync(pathStore); //文件大小
+      let type = stream.fields.type;
       result.data = {
         name: pathObj.name,
         size: fileStat.size,
         path: pathDatabase,
+        type: parseInt(type),
         ext: extension
       };
       return result;

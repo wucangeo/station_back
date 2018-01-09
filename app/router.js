@@ -33,6 +33,7 @@ module.exports = app => {
   router.patch(api_v1 + "/upload/:data_id", controller.upload.update);
   router.delete(api_v1 + "/upload", controller.upload.delete);
   router.post(api_v1 + "/upload/upload", controller.upload.upload);
+  router.post(api_v1 + "/upload/download", controller.upload.download);
 
   //图片上传管理
   router.get(api_v1 + "/image", controller.image.list);

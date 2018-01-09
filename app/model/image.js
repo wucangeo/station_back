@@ -5,7 +5,8 @@ module.exports = app => {
     {
       data_id: {
         type: INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       name: STRING(500),
       size: INTEGER,

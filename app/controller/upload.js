@@ -1,4 +1,4 @@
-"use strict";
+const path = require("path")
 
 const Controller = require("egg").Controller;
 
@@ -66,6 +66,26 @@ class UploadController extends Controller {
     const res_create = await service.upload.create(res_upload.data, user_id);
 
     ctx.body = res_create;
+  }
+  async download() {
+    const { ctx, service } = this;
+    let user_id = ctx.user && ctx.user.data_id ? ctx.user.data_id : 0;
+
+    let result = {
+      code: 1,
+      msg: "下载成功",
+      data: null
+    }
+    let item = ctx.request.body;
+    if (!item || !item.file_path) {
+      result.code = 0;
+      result.msg = "参数错误！"
+      ctx.body = result;
+      return;
+    }
+    ctx.body = result;
+    ctx.set('content-type', 'application/octet-stream');
+    ctx.attachment(path.join(ctx.host, item.file_path));
   }
 }
 module.exports = UploadController;

@@ -5,10 +5,12 @@ module.exports = app => {
     {
       data_id: {
         type: INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       name: STRING(500),
       size: INTEGER,
+      type: INTEGER,
       path: STRING(500),
       ext: STRING(50),
       enable: BOOLEAN,
