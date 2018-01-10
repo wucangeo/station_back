@@ -56,7 +56,9 @@ class AchvMonography extends Service {
     };
     for (var selectKey in keys) {
       if (["title", "journal", "author", "co_author"].includes(selectKey)) {
-        query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
+        if (keys[selectKey]) {
+          query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
+        }
       } else {
         query.where[selectKey] = keys[selectKey];
       }
@@ -118,6 +120,7 @@ class AchvMonography extends Service {
         year: { type: "int", required: false, allowEmpty: true },
         title: { type: "string", required: false, allowEmpty: true },
         pub_type: { type: "string", required: false, allowEmpty: true },
+        pub_date: { type: "string", required: false, allowEmpty: true },
         categories: { type: "string", required: false, allowEmpty: true },
         word_count: { type: "int", required: false, allowEmpty: true },
         press: { type: "string", required: false, allowEmpty: true },
@@ -167,6 +170,7 @@ class AchvMonography extends Service {
         year: { type: "int", required: false, allowEmpty: true },
         title: { type: "string", required: false, allowEmpty: true },
         pub_type: { type: "string", required: false, allowEmpty: true },
+        pub_date: { type: "string", required: false, allowEmpty: true },
         categories: { type: "string", required: false, allowEmpty: true },
         word_count: { type: "int", required: false, allowEmpty: true },
         press: { type: "string", required: false, allowEmpty: true },
@@ -210,15 +214,9 @@ class AchvMonography extends Service {
       data: null,
       msg: msg.delete.succ
     };
-    //参数验证
-    try {
-      ids = JSON.parse(ids);
-    } catch (ex) {
-      ids = null;
-    }
     let error = validator.validate(
       {
-        ids: { type: "array", required: true }
+        ids: { type: "object", required: true }
       },
       { ids }
     );

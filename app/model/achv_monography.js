@@ -15,9 +15,10 @@ module.exports = app => {
       word_count: INTEGER, //'总字数（千）',
       press: STRING(255), // 出版社
       book_number: STRING(255), // 书号（如 978-7-03-045836-0)
+      pub_date: STRING(50),//出版时间
       rank_depart: INTEGER, //   单位排名
-      rank_author: INTEGER, // 本单位首位作者排名
       author: STRING(255), // 封面作者
+      rank_author: INTEGER, // 本单位首位作者排名
       co_author: STRING(500), // 章节作者
       certified_path: STRING(500), // 著作首页、版权页及章节作者证明页电子版
 
