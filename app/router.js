@@ -73,4 +73,10 @@ module.exports = app => {
     controller.achvMonography.update
   );
   router.delete(api_v1 + "/monography", controller.achvMonography.delete);
+  //科研成果-专利
+  router.get(api_v1 + "/patent", controller.achvPatent.list);
+  router.get(api_v1 + "/patent/:data_id", controller.achvPatent.get);
+  router.post(api_v1 + "/patent", controller.achvPatent.create);
+  router.patch(api_v1 + "/patent/:data_id", controller.achvPatent.update);
+  router.delete(api_v1 + "/patent", controller.achvPatent.delete);
 };
