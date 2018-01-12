@@ -18,7 +18,7 @@ module.exports = appInfo => {
 
   config.multipart = {
     fileSize: "50mb",
-    fileExtensions: []
+    fileExtensions: [".pdf"]
   };
 
   //database
