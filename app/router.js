@@ -79,4 +79,10 @@ module.exports = app => {
   router.post(api_v1 + "/patent", controller.achvPatent.create);
   router.patch(api_v1 + "/patent/:data_id", controller.achvPatent.update);
   router.delete(api_v1 + "/patent", controller.achvPatent.delete);
+  //科研成果-奖项
+  router.get(api_v1 + "/awards", controller.achvAwards.list);
+  router.get(api_v1 + "/awards/:data_id", controller.achvAwards.get);
+  router.post(api_v1 + "/awards", controller.achvAwards.create);
+  router.patch(api_v1 + "/awards/:data_id", controller.achvAwards.update);
+  router.delete(api_v1 + "/awards", controller.achvAwards.delete);
 };
