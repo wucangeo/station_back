@@ -85,4 +85,10 @@ module.exports = app => {
   router.post(api_v1 + "/awards", controller.achvAwards.create);
   router.patch(api_v1 + "/awards/:data_id", controller.achvAwards.update);
   router.delete(api_v1 + "/awards", controller.achvAwards.delete);
+  //科研成果-项目
+  router.get(api_v1 + "/project", controller.project.list);
+  router.get(api_v1 + "/project/:data_id", controller.project.get);
+  router.post(api_v1 + "/project", controller.project.create);
+  router.patch(api_v1 + "/project/:data_id", controller.project.update);
+  router.delete(api_v1 + "/project", controller.project.delete);
 };
