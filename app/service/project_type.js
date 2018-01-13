@@ -1,20 +1,15 @@
 const Service = require("egg").Service;
 let attrs = [
   "data_id",
-  "year",
-  "title",
-  "pub_type",
-  "press",
-  "author",
-  "created_at"
+  "type",
 ];
 
-class Project extends Service {
+class ProjectType extends Service {
   async list({
     keys = {},
     offset = 0,
     limit = 10,
-    order_by = "created_at",
+    order_by = "data_id",
     order = 0
   }) {
     const { ctx, logger, config } = this;
@@ -47,7 +42,7 @@ class Project extends Service {
     }
     //组织查询参数
     order = order === 1 ? "DESC" : "ASC";
-    limit = limit < 0 ? 1000000000 : limit;
+    limit = 1000000000;
     var query = {
       offset: offset,
       limit: limit,
@@ -55,7 +50,7 @@ class Project extends Service {
       where: {}
     };
     for (var selectKey in keys) {
-      if (["title", "project_depart", "author"].includes(selectKey)) {
+      if (["name"].includes(selectKey)) {
         if (keys[selectKey]) {
           query.where[selectKey] = { $like: "%" + keys[selectKey] + "%" };
         }
@@ -64,7 +59,7 @@ class Project extends Service {
       }
     }
     //查询
-    let datas = await ctx.model.Project.findAndCountAll(query);
+    let datas = await ctx.model.ProjectType.findAndCountAll(query);
     result.data = datas ? datas : [];
 
     return result;
@@ -100,7 +95,7 @@ class Project extends Service {
       }
     };
     //查询
-    var achvMonography = await ctx.model.Project.findOne(query);
+    var achvMonography = await ctx.model.ProjectType.findOne(query);
 
     result.data = achvMonography;
     return result;
@@ -117,19 +112,8 @@ class Project extends Service {
     //参数验证
     let error = validator.validate(
       {
-        title: { type: "string", required: false, allowEmpty: true },
-        author: { type: "string", required: false, allowEmpty: true },
+        name: { type: "string", required: false, allowEmpty: true },
         type: { type: "int", required: false, allowEmpty: true },
-        project_level: { type: "string", required: false, allowEmpty: true },
-        project_funds: { type: "number", required: false, allowEmpty: true },
-        project_depart: { type: "string", required: false, allowEmpty: true },
-        project_type: { type: "string", required: false, allowEmpty: true },
-        start_date: { type: "string", required: false, allowEmpty: true },
-        end_date: { type: "string", required: false, allowEmpty: true },
-        project_status: { type: "string", required: false, allowEmpty: true },
-        finish_year: { type: "int", required: false, allowEmpty: true },
-        fillin_year: { type: "int", required: false, allowEmpty: true },
-        enable: { type: "int", required: false, allowEmpty: true }
       },
       item
     );
@@ -143,7 +127,7 @@ class Project extends Service {
     item.created_user = user_id;
     item.updated_user = user_id;
     //查询
-    let data_created = await ctx.model.Project.create(item);
+    let data_created = await ctx.model.ProjectType.create(item);
     if (!data_created) {
       result.code = 0;
       result.msg = msg.create.err;
@@ -166,19 +150,8 @@ class Project extends Service {
     let error = validator.validate(
       {
         data_id: { type: "int", required: true, allowEmpty: false },
-        title: { type: "string", required: false, allowEmpty: true },
+        name: { type: "string", required: false, allowEmpty: true },
         type: { type: "int", required: false, allowEmpty: true },
-        author: { type: "string", required: false, allowEmpty: true },
-        project_level: { type: "string", required: false, allowEmpty: true },
-        project_funds: { type: "number", required: false, allowEmpty: true },
-        project_depart: { type: "string", required: false, allowEmpty: true },
-        project_type: { type: "string", required: false, allowEmpty: true },
-        start_date: { type: "string", required: false, allowEmpty: true },
-        end_date: { type: "string", required: false, allowEmpty: true },
-        project_status: { type: "string", required: false, allowEmpty: true },
-        finish_year: { type: "int", required: false, allowEmpty: true },
-        fillin_year: { type: "int", required: false, allowEmpty: true },
-        enable: { type: "int", required: false, allowEmpty: true }
       },
       { data_id, ...updates }
     );
@@ -189,7 +162,7 @@ class Project extends Service {
       return result;
     }
     //data_id有效性验证
-    let achvMonography = await ctx.model.Project.findById(data_id);
+    let achvMonography = await ctx.model.ProjectType.findById(data_id);
     if (!achvMonography) {
       result.code = 0;
       result.msg = msg.err_find;
@@ -225,7 +198,7 @@ class Project extends Service {
       return result;
     }
     //查询
-    const data_deleted = await ctx.model.Project.destroy({
+    const data_deleted = await ctx.model.ProjectType.destroy({
       where: { data_id: { $in: ids } }
     });
     if (!data_deleted) {
@@ -238,4 +211,4 @@ class Project extends Service {
     return result;
   }
 }
-module.exports = Project;
+module.exports = ProjectType;

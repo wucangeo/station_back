@@ -91,4 +91,10 @@ module.exports = app => {
   router.post(api_v1 + "/project", controller.project.create);
   router.patch(api_v1 + "/project/:data_id", controller.project.update);
   router.delete(api_v1 + "/project", controller.project.delete);
+  //科研成果-项目类型
+  router.get(api_v1 + "/project_type", controller.projectType.list);
+  router.get(api_v1 + "/project_type/:data_id", controller.projectType.get);
+  router.post(api_v1 + "/project_type", controller.projectType.create);
+  router.patch(api_v1 + "/project_type/:data_id", controller.projectType.update);
+  router.delete(api_v1 + "/project_type", controller.projectType.delete);
 };
