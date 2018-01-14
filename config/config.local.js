@@ -10,7 +10,7 @@ exports.sequelize = {
   password: "noroot",
   timezone: "+08:00",
   dialectOptions: {
-    timeout: 30
+    timeout: 30000
   },
   pool: {
     max: 5,

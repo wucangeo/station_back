@@ -30,7 +30,15 @@ module.exports = appInfo => {
     port: "3306",
     username: "root",
     password: "noroot",
-    timezone: "+08:00"
+    timezone: "+08:00",
+    dialectOptions: {
+      timeout: 30000
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      idle: 30000
+    },
   };
 
   //返回结果中的msg
