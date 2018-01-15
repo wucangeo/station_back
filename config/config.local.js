@@ -3,8 +3,8 @@
 exports.sequelize = {
   dialect: "mysql", // support: mysql, mariadb, postgres, mssql
   database: "stations",
-  // host: "localhost",
-  host: "47.93.225.139",
+  host: "localhost",
+  // host: "47.93.225.139",
   port: "3306",
   username: "root",
   password: "noroot",
@@ -16,7 +16,7 @@ exports.sequelize = {
     max: 5,
     min: 0,
     idle: 30000
-  },
+  }
 };
 
 exports.cors = {
