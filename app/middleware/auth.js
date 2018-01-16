@@ -23,12 +23,22 @@ module.exports = options => {
     }
     let user_id = 0;
     let user = {
-      data_id: 0,
+      data_id: -1,
       name: "guest",
       enable: 1
     };
     if (access_key) {
       user_id = utils.decrypt(access_key, "soil");
+      if (!user_id || parseFloat(user_id) >= 0) {
+        ctx.status = 401;
+        ctx.body = {
+          code: 0,
+          data: null,
+          msg: "access_token无效。"
+        };
+        return;
+      }
+      user.data_id = parseFloat(user_id);
     } else {
       var decoded = jwt.decode(access_token, { json: true });
       if (!decoded || !decoded.user_id) {
