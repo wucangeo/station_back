@@ -54,7 +54,19 @@ class Station extends Service {
       limit: limit,
       offset: offset,
       order: [[order_by, order]],
-      where: {}
+      where: {},
+      include: [
+        {
+          model: ctx.model.User,
+          as: "user_created",
+          attributes: ["name"]
+        },
+        {
+          model: ctx.model.User,
+          as: "user_updated",
+          attributes: ["name"]
+        }
+      ]
     };
     for (var selectKey in keys) {
       if (selectKey == "title") {

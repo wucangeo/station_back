@@ -25,5 +25,17 @@ module.exports = app => {
     }
   );
 
+  //关联
+  Station.associate = function() {
+    Station.belongsTo(app.model.User, {
+      foreignKey: "created_user",
+      as: "user_created"
+    });
+    Station.belongsTo(app.model.User, {
+      foreignKey: "updated_user",
+      as: "user_updated"
+    });
+  };
+
   return Station;
 };
