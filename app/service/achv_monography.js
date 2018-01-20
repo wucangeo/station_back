@@ -129,7 +129,7 @@ class AchvMonography extends Service {
         rank_author: { type: "int", required: false, allowEmpty: true },
         author: { type: "string", required: false, allowEmpty: true },
         co_author: { type: "string", required: false, allowEmpty: true },
-        certified_path: { type: "string", required: false, allowEmpty: true },
+        // certified_path: { type: "string", required: false, allowEmpty: true },
         enable: { type: "int", required: false, allowEmpty: true }
       },
       item
@@ -179,7 +179,7 @@ class AchvMonography extends Service {
         rank_author: { type: "int", required: false, allowEmpty: true },
         author: { type: "string", required: false, allowEmpty: true },
         co_author: { type: "string", required: false, allowEmpty: true },
-        certified_path: { type: "string", required: false, allowEmpty: true },
+        // certified_path: { type: "string", required: false, allowEmpty: true },
         enable: { type: "int", required: false, allowEmpty: true }
       },
       { data_id, ...updates }
