@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const mkdirp = require("mkdirp");
 const awaitWriteStream = require("await-stream-ready").write;
 const sendToWormhole = require("stream-wormhole");
 
@@ -236,7 +237,7 @@ class Upload extends Service {
     return result;
   }
   async upload(stream, user_id) {
-    const { ctx, logger, config } = this;
+    const { ctx, logger, config, app } = this;
     const { validator } = this.app;
     let msg = config.msg;
     let result = {
@@ -294,6 +295,11 @@ class Upload extends Service {
       .replace(/\..+/, ""); //获取本地时间：20171217213010
     let newFilename = datetimeStr + "_" + randomStr + extension; //20171217213010_bc69fg.jpg
     //存储路径;
+    let folderPath = path.join(app.baseDir, pathStore, fileType);
+    if (!fs.existsSync(folderPath)) {
+      await mkdirp(folderPath);
+    }
+
     pathStore = path.join(pathStore, fileType, newFilename);
     pathDatabase = path.join(pathDatabase, fileType, newFilename);
 
@@ -301,7 +307,7 @@ class Upload extends Service {
     try {
       await awaitWriteStream(stream.pipe(writeStream));
       let fileStat = fs.statSync(pathStore); //文件大小
-      let type = stream.fields.type;
+      let type = stream.fields.type || 0;
       result.data = {
         name: pathObj.name,
         size: fileStat.size,
