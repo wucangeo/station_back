@@ -1,5 +1,6 @@
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const utils = require("../utils");
+const quertString = require("querystring");
 
 module.exports = options => {
   return async function auth(ctx, next) {
@@ -82,6 +83,11 @@ module.exports = options => {
         };
         return;
       }
+    }
+
+    //访问记录
+    if (!["/api/v1/user/verify"].includes(ctx.request.path)) {
+      ctx.service.logView.logView(user_id);
     }
 
     ctx.user = user;

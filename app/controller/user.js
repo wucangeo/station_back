@@ -48,7 +48,11 @@ class UserController extends Controller {
     const { ctx, service } = this;
     let { username, password } = ctx.request.body;
     var result = await ctx.service.user.login(username, password);
-
+    //记录登录日志
+    if (result && result.data) {
+      let user_id = result.data.data_id;
+      ctx.service.logView.logView(user_id);
+    }
     ctx.body = result;
   }
   async register() {
