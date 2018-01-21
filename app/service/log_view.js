@@ -240,6 +240,7 @@ class LogView extends Service {
     };
     //备用ip地址解析
     //http://ip.taobao.com/service/getIpInfo.php?ip=180.77.12.123
+    // let curl = "http://freeapi.ipip.net/" + ip;
 
     //对ip进行验证
     if (!ip) {
@@ -254,10 +255,16 @@ class LogView extends Service {
       return result;
     }
 
-    let curl = "http://freeapi.ipip.net/" + ip;
+    let curl = "http://ip.taobao.com/service/getIpInfo.php?ip=" + ip;
     let res_get = await axios(curl);
-    if (res_get && res_get.status === 200 && res_get.data) {
-      result.data = res_get.data;
+    if (
+      res_get &&
+      res_get.status === 200 &&
+      res_get.data &&
+      res_get.data.data
+    ) {
+      let data = res_get.data.data;
+      result.data = [data.country, data.region, data.city];
     }
     return result;
   }
