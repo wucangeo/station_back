@@ -282,6 +282,14 @@ class LogView extends Service {
       view_params: ctx.request.querystring,
       method: ctx.request.method
     };
+    //处理浏览模块
+    let pathArr = ctx.request.path.split("/");
+    if (pathArr.length >= 4) {
+      if (pathArr[3] === "log_view") {
+        return result;
+      }
+      logItem.view_url = pathArr[3];
+    }
     //解析ip
     let res_ip = await ctx.service.logView.parseIP(ctx.ip);
     if (res_ip && res_ip.code === 1 && res_ip.data) {
