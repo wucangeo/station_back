@@ -53,6 +53,10 @@ class LogViewController extends Controller {
   async count() {
     const { ctx, service } = this;
     let query = ctx.query;
+    query.distinct = query.distinct === "true" ? true : false;
+    query.from_time = parseInt(query.from_time)
+    query.to_time = parseInt(query.to_time)
+    query.where = query.where ? JSON.parse(query.where) : null;
     const result = await service.logView.count(query);
     ctx.body = result;
   }

@@ -20,8 +20,8 @@ module.exports = app => {
   router.get(api_v1 + "/user/verify", controller.user.verify);
   //访问日志
   router.get(api_v1 + "/log_view", controller.logView.list);
-  router.get(api_v1 + "/log_view/:data_id", controller.logView.get);
   router.get(api_v1 + "/log_view/count", controller.logView.count);
+  router.get(api_v1 + "/log_view/:data_id", controller.logView.get);
   router.post(api_v1 + "/log_view", controller.logView.create);
   router.patch(api_v1 + "/log_view/:data_id", controller.logView.update);
   router.delete(api_v1 + "/log_view", controller.logView.delete);

@@ -3,6 +3,7 @@ const utils = require("../utils");
 
 const Service = require("egg").Service;
 let attrs = [
+  "*",
   "data_id",
   "user_id",
   "user_ip",
@@ -295,7 +296,8 @@ class LogView extends Service {
     key = "user_id",
     distinct = false,
     from_time = 0, //当天00:00:00
-    to_time = 1 //明天00:00:00
+    to_time = 1, //明天00:00:00
+    where = null
   }) {
     const { ctx, logger, config } = this;
     const { validator } = this.app;
@@ -331,11 +333,24 @@ class LogView extends Service {
     }
     let from_time_str = utils.getDateStringByIndex(from_time);
     let to_time_str = utils.getDateStringByIndex(to_time);
-    let sql = `SELECT ${distinct_str} count(s.${key}) as count FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}'`;
+    let where_str = ""
+    if (where) {
+      for (let key in where) {
+        where_str += ` AND ${key}='${where[key]}'`
+      }
+    }
+    //开始请求
+    let sql = `SELECT count(${distinct_str} ${key}) as count FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' ${where_str}`;
     //查询
-    let res_query = await ctx.model.LogView.query(sql);
-    console.log(res_query);
-    return res_query;
+    let res_query = await ctx.model.query(sql);
+    if (!res_query || res_query.length != 2 || res_query[0].length != 1) {
+      result.code = 0;
+      result.msg = "查询失败";
+      return result;
+    }
+    let count = res_query[0][0].count;
+    result.data = count;
+    return result;
   }
 }
 module.exports = LogView;
