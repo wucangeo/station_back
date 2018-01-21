@@ -18,7 +18,13 @@ module.exports = app => {
   router.patch(api_v1 + "/user/:data_id", controller.user.update);
   router.delete(api_v1 + "/user", controller.user.delete);
   router.get(api_v1 + "/user/verify", controller.user.verify);
-
+  //访问日志
+  router.get(api_v1 + "/log_view", controller.logView.list);
+  router.get(api_v1 + "/log_view/:data_id", controller.logView.get);
+  router.get(api_v1 + "/log_view/count", controller.logView.count);
+  router.post(api_v1 + "/log_view", controller.logView.create);
+  router.patch(api_v1 + "/log_view/:data_id", controller.logView.update);
+  router.delete(api_v1 + "/log_view", controller.logView.delete);
   //站点管理
   router.get(api_v1 + "/station", controller.station.list);
   router.get(api_v1 + "/station/:data_id", controller.station.get);
@@ -95,6 +101,9 @@ module.exports = app => {
   router.get(api_v1 + "/project_type", controller.projectType.list);
   router.get(api_v1 + "/project_type/:data_id", controller.projectType.get);
   router.post(api_v1 + "/project_type", controller.projectType.create);
-  router.patch(api_v1 + "/project_type/:data_id", controller.projectType.update);
+  router.patch(
+    api_v1 + "/project_type/:data_id",
+    controller.projectType.update
+  );
   router.delete(api_v1 + "/project_type", controller.projectType.delete);
 };

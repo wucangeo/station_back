@@ -44,11 +44,11 @@ class User extends Service {
     for (var selectKey in keys) {
       if (selectKey == "name") {
         if (keys[selectKey]) {
-          query.where['$or'] = [
+          query.where["$or"] = [
             { name: { $like: "%" + keys[selectKey] + "%" } },
             { username: { $like: "%" + keys[selectKey] + "%" } },
             { department: { $like: "%" + keys[selectKey] + "%" } }
-          ]
+          ];
         }
       } else {
         query.where[selectKey] = keys[selectKey];

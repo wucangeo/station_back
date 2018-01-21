@@ -1,4 +1,5 @@
 const axios = require("axios");
+const utils = require("../utils");
 
 const Service = require("egg").Service;
 let attrs = [
@@ -236,6 +237,9 @@ class LogView extends Service {
       data: null,
       msg: msg.get.succ
     };
+    //备用ip地址解析
+    //http://ip.taobao.com/service/getIpInfo.php?ip=180.77.12.123
+
     //对ip进行验证
     if (!ip) {
       result.code = 0;
@@ -286,6 +290,52 @@ class LogView extends Service {
       logItem.city = ipData[2];
     }
     return await ctx.service.logView.create(logItem);
+  }
+  async count({
+    key = "user_id",
+    distinct = false,
+    from_time = 0, //当天00:00:00
+    to_time = 1 //明天00:00:00
+  }) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
+    let result = {
+      code: 1,
+      data: null,
+      msg: msg.list.succ
+    };
+    //参数验证
+    let error = validator.validate(
+      {
+        key: {
+          type: "enum",
+          values: attrs
+        },
+        distinct: { type: "boolean" },
+        from_time: { type: "int" },
+        to_time: { type: "int" }
+      },
+      { key, distinct, from_time, to_time }
+    );
+    if (error) {
+      result.code = 0;
+      result.msg = msg.err_param;
+      result.data = error;
+      return result;
+    }
+    //组织查询参数
+    let distinct_str = "";
+    if (distinct) {
+      distinct_str = "DISTINCT";
+    }
+    let from_time_str = utils.getDateStringByIndex(from_time);
+    let to_time_str = utils.getDateStringByIndex(to_time);
+    let sql = `SELECT ${distinct_str} count(s.${key}) as count FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}'`;
+    //查询
+    let res_query = await ctx.model.LogView.query(sql);
+    console.log(res_query);
+    return res_query;
   }
 }
 module.exports = LogView;

@@ -50,5 +50,11 @@ class LogViewController extends Controller {
 
     ctx.body = result;
   }
+  async count() {
+    const { ctx, service } = this;
+    let query = ctx.query;
+    const result = await service.logView.count(query);
+    ctx.body = result;
+  }
 }
 module.exports = LogViewController;
