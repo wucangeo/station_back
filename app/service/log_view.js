@@ -279,7 +279,7 @@ class LogView extends Service {
       province: "",
       city: "",
       view_url: ctx.request.path,
-      view_params: "",
+      view_params: ctx.request.querystring,
       method: ctx.request.method
     };
     //解析ip
