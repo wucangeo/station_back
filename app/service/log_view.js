@@ -293,11 +293,9 @@ class LogView extends Service {
     return await ctx.service.logView.create(logItem);
   }
   async count({
-    key = "user_id",
-    distinct = false,
+    type = 1,
     from_time = 0, //当天00:00:00
-    to_time = 1, //明天00:00:00
-    where = null
+    to_time = 1 //明天00:00:00
   }) {
     const { ctx, logger, config } = this;
     const { validator } = this.app;
@@ -310,15 +308,11 @@ class LogView extends Service {
     //参数验证
     let error = validator.validate(
       {
-        key: {
-          type: "enum",
-          values: attrs
-        },
-        distinct: { type: "boolean" },
+        type: { type: "int" },
         from_time: { type: "int" },
         to_time: { type: "int" }
       },
-      { key, distinct, from_time, to_time }
+      { type, from_time, to_time }
     );
     if (error) {
       result.code = 0;
@@ -327,20 +321,20 @@ class LogView extends Service {
       return result;
     }
     //组织查询参数
-    let distinct_str = "";
-    if (distinct) {
-      distinct_str = "DISTINCT";
-    }
     let from_time_str = utils.getDateStringByIndex(from_time);
     let to_time_str = utils.getDateStringByIndex(to_time);
-    let where_str = ""
-    if (where) {
-      for (let key in where) {
-        where_str += ` AND ${key}='${where[key]}'`
-      }
-    }
     //开始请求
-    let sql = `SELECT count(${distinct_str} ${key}) as count FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' ${where_str}`;
+    let sql = "";
+    if (type === 0) {
+      sql = `SELECT count(*) as count from sta_log_view where 1=1`;
+    } else if (type === 1) {
+      sql = `SELECT count(DISTINCT user_ip) as count from sta_log_view where 1=1`;
+    } else if (type === 2) {
+      sql = `SELECT count(DISTINCT user_id) as count from sta_log_view where view_url = '/api/v1/user/login'`;
+    } else if (type === 3) {
+      sql = `SELECT count(*) as count from sta_log_view where method in ('POST','PATCH') AND view_url != '/api/v1/user/login'`;
+    }
+    sql += ` AND created_at BETWEEN '${from_time_str}' AND '${to_time_str}'`;
     //查询
     let res_query = await ctx.model.query(sql);
     if (!res_query || res_query.length != 2 || res_query[0].length != 1) {
