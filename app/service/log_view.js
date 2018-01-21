@@ -268,7 +268,7 @@ class LogView extends Service {
     }
     return result;
   }
-  async logView(user_id) {
+  async logView(user_id = 0) {
     const { ctx, logger, config } = this;
     let msg = config.msg;
 
@@ -279,6 +279,9 @@ class LogView extends Service {
     };
 
     //添加到日志中
+    if (user_id < 0) {
+      user_id = -1;
+    }
     let logItem = {
       user_id: user_id,
       user_ip: ctx.ip,
