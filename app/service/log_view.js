@@ -446,9 +446,9 @@ class LogView extends Service {
     //开始请求
     let sql = "";
     if (type === 2) {
-      sql = `SELECT date_format(s.created_at, "%Y-%m-%d") as date, s.view_url as name, count(*) as value FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY date_format(s.created_at, "%Y-%m-%d"),s.view_url ORDER BY value DESC`;
+      sql = `SELECT date_format(s.created_at, "%m-%d") as date, s.view_url as name, count(*) as value FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY date_format(s.created_at, "%m-%d"),s.view_url ORDER BY value DESC`;
     } else {
-      sql = `SELECT date_format(s.created_at, "%Y-%m-%d") as date, count(*) as value FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY date_format(s.created_at, "%Y-%m-%d") ORDER BY date`;
+      sql = `SELECT date_format(s.created_at, "%m-%d") as date, count(*) as value FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY date_format(s.created_at, "%m-%d") ORDER BY date`;
     }
     //查询
     let res_query = await ctx.model.query(sql);
