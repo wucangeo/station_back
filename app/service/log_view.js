@@ -412,5 +412,53 @@ class LogView extends Service {
     result.data = res_query[0];
     return result;
   }
+  async url({
+    type = 1,
+    from_time = 0, //当天00:00:00
+    to_time = 1 //明天00:00:00
+  }) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
+    let result = {
+      code: 1,
+      data: null,
+      msg: msg.list.succ
+    };
+    //参数验证
+    let error = validator.validate(
+      {
+        type: { type: "int" },
+        from_time: { type: "int" },
+        to_time: { type: "int" }
+      },
+      { type, from_time, to_time }
+    );
+    if (error) {
+      result.code = 0;
+      result.msg = msg.err_param;
+      result.data = error;
+      return result;
+    }
+    //组织查询参数
+    let from_time_str = utils.getDateStringByIndex(from_time);
+    let to_time_str = utils.getDateStringByIndex(to_time);
+    //开始请求
+    let sql = "";
+    if (type === 2) {
+      sql = `SELECT date_format(s.created_at, "%Y-%m-%d") as date, s.view_url as name, count(*) as value FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY date_format(s.created_at, "%Y-%m-%d"),s.view_url ORDER BY value DESC`;
+    } else {
+      sql = `SELECT date_format(s.created_at, "%Y-%m-%d") as date, count(*) as value FROM sta_log_view s WHERE s.created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY date_format(s.created_at, "%Y-%m-%d") ORDER BY date`;
+    }
+    //查询
+    let res_query = await ctx.model.query(sql);
+    if (!res_query || res_query.length != 2) {
+      result.code = 0;
+      result.msg = "查询失败";
+      return result;
+    }
+    result.data = res_query[0];
+    return result;
+  }
 }
 module.exports = LogView;

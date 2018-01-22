@@ -68,5 +68,14 @@ class LogViewController extends Controller {
     const result = await service.logView.map(query);
     ctx.body = result;
   }
+  async url() {
+    const { ctx, service } = this;
+    let query = ctx.query;
+    query.type = parseInt(query.type);
+    query.from_time = parseInt(query.from_time);
+    query.to_time = parseInt(query.to_time);
+    const result = await service.logView.url(query);
+    ctx.body = result;
+  }
 }
 module.exports = LogViewController;
