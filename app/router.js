@@ -21,6 +21,7 @@ module.exports = app => {
   //访问日志
   router.get(api_v1 + "/log_view", controller.logView.list);
   router.get(api_v1 + "/log_view/count", controller.logView.count);
+  router.get(api_v1 + "/log_view/map", controller.logView.map);
   router.get(api_v1 + "/log_view/:data_id", controller.logView.get);
   router.post(api_v1 + "/log_view", controller.logView.create);
   router.patch(api_v1 + "/log_view/:data_id", controller.logView.update);

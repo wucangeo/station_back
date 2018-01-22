@@ -364,5 +364,53 @@ class LogView extends Service {
     result.data = count;
     return result;
   }
+  async map({
+    type = 1,
+    from_time = 0, //当天00:00:00
+    to_time = 1 //明天00:00:00
+  }) {
+    const { ctx, logger, config } = this;
+    const { validator } = this.app;
+    let msg = config.msg;
+    let result = {
+      code: 1,
+      data: null,
+      msg: msg.list.succ
+    };
+    //参数验证
+    let error = validator.validate(
+      {
+        type: { type: "int" },
+        from_time: { type: "int" },
+        to_time: { type: "int" }
+      },
+      { type, from_time, to_time }
+    );
+    if (error) {
+      result.code = 0;
+      result.msg = msg.err_param;
+      result.data = error;
+      return result;
+    }
+    //组织查询参数
+    let from_time_str = utils.getDateStringByIndex(from_time);
+    let to_time_str = utils.getDateStringByIndex(to_time);
+    //开始请求
+    let sql = "";
+    if (type === 2) {
+      sql = `SELECT s.province AS name,count(s.province) AS value  FROM sta_log_view s WHERE s. created_at BETWEEN '${from_time_str}' AND '${to_time_str}' AND province != '' GROUP BY province ORDER BY value desc`;
+    } else {
+      sql = `SELECT s.city AS name,count(s.city) AS value FROM sta_log_view s WHERE city != '' AND created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY city ORDER BY value desc`;
+    }
+    //查询
+    let res_query = await ctx.model.query(sql);
+    if (!res_query || res_query.length != 2) {
+      result.code = 0;
+      result.msg = "查询失败";
+      return result;
+    }
+    result.data = res_query[0];
+    return result;
+  }
 }
 module.exports = LogView;
