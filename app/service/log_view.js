@@ -398,8 +398,10 @@ class LogView extends Service {
     //开始请求
     let sql = "";
     if (type === 2) {
+      //按省统计
       sql = `SELECT s.province AS name,count(s.province) AS value  FROM sta_log_view s WHERE s. created_at BETWEEN '${from_time_str}' AND '${to_time_str}' AND province != '' GROUP BY province ORDER BY value desc`;
     } else {
+      //按市统计
       sql = `SELECT s.city AS name,count(s.city) AS value FROM sta_log_view s WHERE city != '' AND created_at BETWEEN '${from_time_str}' AND '${to_time_str}' GROUP BY city ORDER BY value desc`;
     }
     //查询
