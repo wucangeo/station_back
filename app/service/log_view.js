@@ -348,7 +348,7 @@ class LogView extends Service {
     } else if (type === 1) {
       sql = `SELECT count(DISTINCT user_ip) as count from sta_log_view where 1=1`;
     } else if (type === 2) {
-      sql = `SELECT count(DISTINCT user_id) as count from sta_log_view where view_url = '/api/v1/user/login'`;
+      sql = `SELECT count(DISTINCT user_id) AS count FROM sta_log_view WHERE user_id > 0`;
     } else if (type === 3) {
       sql = `SELECT count(*) as count from sta_log_view where method in ('POST','PATCH') AND view_url != '/api/v1/user/login'`;
     }
