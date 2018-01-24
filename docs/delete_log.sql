@@ -1,0 +1,4 @@
+-- SHOW VARIABLES LIKE 'event_scheduler'; --查询是否开启定时器
+-- SET GLOBAL event_scheduler = 1; --设置开启定时器
+-- SHOW VARIABLES LIKE 'event_scheduler'; --确认是否开启定时器
+-- CREATE EVENT IF NOT EXISTS delete_expire_log ON SCHEDULE EVERY 1 DAY DO DELETE FROM sta_log_view WHERE date_sub(curdate(), INTERVAL 30 DAY) > date(`created_at`);
