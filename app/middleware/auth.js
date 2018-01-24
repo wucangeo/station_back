@@ -4,11 +4,21 @@ const quertString = require("querystring");
 
 module.exports = options => {
   return async function auth(ctx, next) {
+    //排除例外
     let whiteList = ["/", "/api/v1/user/login", "/api/v1/user/register"];
-    if (whiteList.includes(ctx.path)) {
+    let pathArr = ctx.path.split("/");
+    console.log(pathArr);
+    if (
+      (pathArr.length === 2 && pathArr[1] === "") ||
+      (pathArr.length > 2 && pathArr[1] === "public") ||
+      (pathArr.length === 5 &&
+        (pathArr[4] === "login" || pathArr[4] === "register"))
+    ) {
+      console.log(pathArr);
       await next();
       return;
     }
+    //处理权限
     let req = ctx.request,
       res = ctx.response;
     var access_key = req.query.access_key;
