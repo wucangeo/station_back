@@ -7,14 +7,12 @@ module.exports = options => {
     //排除例外
     let whiteList = ["/", "/api/v1/user/login", "/api/v1/user/register"];
     let pathArr = ctx.path.split("/");
-    console.log(pathArr);
     if (
       (pathArr.length === 2 && pathArr[1] === "") ||
       (pathArr.length > 2 && pathArr[1] === "public") ||
       (pathArr.length === 5 &&
         (pathArr[4] === "login" || pathArr[4] === "register"))
     ) {
-      console.log(pathArr);
       await next();
       return;
     }
