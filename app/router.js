@@ -108,4 +108,11 @@ module.exports = app => {
     controller.projectType.update
   );
   router.delete(api_v1 + "/project_type", controller.projectType.delete);
+  //资源-------------------
+  //样地资源
+  router.get(api_v1 + "/resource/land", controller.resLand.list);
+  router.get(api_v1 + "/resource/land/:data_id", controller.resLand.get);
+  router.post(api_v1 + "/resource/land", controller.resLand.create);
+  router.patch(api_v1 + "/resource/land/:data_id", controller.resLand.update);
+  router.delete(api_v1 + "/resource/land", controller.resLand.delete);
 };
