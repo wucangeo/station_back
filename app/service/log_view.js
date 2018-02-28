@@ -312,8 +312,8 @@ class LogView extends Service {
   }
   async count({
     type = 1,
-    from_time = 0, //当天00:00:00
-    to_time = 1 //明天00:00:00
+    from_time = -1, //当天23:59:59
+    to_time = 0 //明天23:59:59
   }) {
     const { ctx, logger, config } = this;
     const { validator } = this.app;
